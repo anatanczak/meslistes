@@ -86,8 +86,6 @@ class ListeTableViewCell: SwipeTableViewCell {
  
         //titleLabel Layout
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        //titleLabel.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-       
         
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: distanceBetweenIconViewAndTitlelabel),
@@ -96,7 +94,8 @@ class ListeTableViewCell: SwipeTableViewCell {
             ])
         
     }
-
+    
+ //MARK: - DIFFERENT METHODS
     
     func fillWith(model: Liste?) {
        
@@ -138,7 +137,5 @@ class ListeTableViewCell: SwipeTableViewCell {
     override func prepareForReuse() {
         titleLabel.text = nil
         iconView.image = nil
-        
     }
-
 }

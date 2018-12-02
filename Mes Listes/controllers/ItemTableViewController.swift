@@ -50,6 +50,7 @@ class ItemTableViewController: UIViewController {
     
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         setupNavigationBar()
         setupViews()
@@ -57,12 +58,7 @@ class ItemTableViewController: UIViewController {
         
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-//        subviewForTextFieldAndPlusButton.addTopBorderWithColor(color: .white, width: borderSubView)
-//        subviewForTextFieldAndPlusButton.addBottomBorderWithColor(color: .white, width: borderSubView)
-    }
+
     private func setupNavigationBar () {
         
         let title = selectedListe?.name.uppercased() ?? "meslistes"
@@ -70,13 +66,6 @@ class ItemTableViewController: UIViewController {
         
       let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 19, weight: .light), NSAttributedString.Key.foregroundColor: UIColor.black]
         navigationController?.navigationBar.titleTextAttributes = attributes
-        
-//        var rightImage = UIImage(named: "plus-icon")
-//        rightImage = rightImage?.withRenderingMode(.alwaysOriginal)
-//        let rightNavigationButton = UIBarButtonItem(image: rightImage, style: .plain, target: self, action: #selector (rightBarButtonAction))
-//        rightNavigationButton.tintColor = UIColor.white
-//
-//        self.navigationItem.setRightBarButton(rightNavigationButton, animated: false)
         
         let leftNavigationButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back-button-icon") , style: .plain, target: self, action: #selector(leftBarButtonAction))
         leftNavigationButton.tintColor = .black
@@ -106,9 +95,7 @@ class ItemTableViewController: UIViewController {
         textFieldItems.backgroundColor = .clear
         textFieldItems.placeholder = textFieldPlaceholderText
         textFieldItems.delegate = self
-
-//        textField.layer.borderColor = UIColor.white.cgColor
-//        textField.layer.borderWidth = borderTextFieldAndPlusBotton
+        textFieldItems.returnKeyType = UIReturnKeyType.next
 
         textFieldItems.becomeFirstResponder()
         subviewForTextFieldAndPlusButton.addSubview(textFieldItems)
@@ -270,29 +257,26 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         if orientation == .left {
             guard isSwipeRightEnabled else { return nil }
             
+            //STRIKE OUT
             let strikeOut = SwipeAction(style: .default, title: nil) { (action, indexPath) in
-                
                 self.strikeOut(at: indexPath)
+                tableView.reloadRows(at: [indexPath], with: .automatic)
             }
             strikeOut.image = #imageLiteral(resourceName: "strikeout-item-icon")
-            
             strikeOut.backgroundColor = self.colorize(hex: 0xF0D6E2)
             
+             //REMINDER
             let setReminder = SwipeAction(style: .default, title: nil) { action, indexPath in
-                
                 self.updateModelByAddingAReminder(at: indexPath)
-                
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
-                
             }
             setReminder.image = #imageLiteral(resourceName: "reminder-item-icon")
             setReminder.backgroundColor = self.colorize(hex: 0xF0D6E2)
             
+             //CALENDAR
             let addEventToCalendar = SwipeAction(style: .default, title: nil) { (action, indexPath) in
-                
                 self.addEventToCalendar(at: indexPath)
-                
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
@@ -302,18 +286,15 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             return[strikeOut, setReminder, addEventToCalendar]
             
         }else{
-            
+             //DELETE
             let deleteAction = SwipeAction(style: .destructive, title: nil) { action, indexPath in
-                
                 self.updateModel(at: indexPath)
-                
             }
-            // customize the action appearance
             deleteAction.image = #imageLiteral(resourceName: "delete-item-icon")
             deleteAction.backgroundColor = self.colorize(hex: 0xF25D61)
             
+            //take photo
             let takePhotoAction = SwipeAction(style: .default, title: nil) { (action, indexpath) in
-                
                 //take photo action
                 print("photo has been taken")
                 
@@ -359,8 +340,6 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         dpVC.modalPresentationStyle = .overCurrentContext
         dpVC.setReminder = setReminder
         self.present(dpVC, animated: true, completion: nil)
-        print("it has finished")
-        
     }
     
     // sends the notification to user to remind the list
@@ -387,13 +366,9 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         
         let dpVC = DatePickerPopupViewController()
         dpVC.modalPresentationStyle = .overCurrentContext
-        
-        
         dpVC.dateForCalendar = true
-   
         dpVC.saveEventToCalendar = saveEventToCalendar
         self.present(dpVC, animated: true, completion: nil)
-        
     }
     
     func saveEventToCalendar(_ date: Date) ->(){
@@ -413,13 +388,13 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 }catch{
                     print("error saving the event\(error)")
                 }
-                
             }else{
                 print("error getting access to calendar\(error!)")
             }
         }
     }
     
+    //strikes out the text
     func strikeOut(at indexPath: IndexPath) {
         if let currentItem = self.items?[indexPath.row] {
             do {
@@ -429,8 +404,6 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             }catch{
                 print("error updating realm\(error)")
             }
-            
-            tableView.reloadData()
         }
     }
 }

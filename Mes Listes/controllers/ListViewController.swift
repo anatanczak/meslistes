@@ -16,8 +16,10 @@ import SnapKit
 class ListViewController: UIViewController {
     
     //MARK: - Constants
-    let cellHeight: CGFloat = 70
-    let titleFontSize: CGFloat = 28.5
+    private let cellHeight: CGFloat = 70
+    private let titleFontSize: CGFloat = 28.5
+    private let settingsAlertTitle = "We need your permission"
+    private let settingsAlertMessage = "Change your settings"
     
     //MARK: - Properties
     let backgroundImageView: UIImageView = UIImageView()
@@ -30,7 +32,8 @@ class ListViewController: UIViewController {
     var chosenNameforCalendar = ""
     var isSwipeRightEnabled = true
     
-    
+    let dpVC = DatePickerPopupViewController()
+
     
     //MARK: - Life Cycle
     override func viewDidLoad() {
@@ -246,7 +249,6 @@ extension ListViewController: SwipeTableViewCellDelegate {
         //diferent expansion styles
         options.expansionStyle = orientation == .left ? .selection : .destructive
         options.minimumButtonWidth = 70.0
-        
         return options
     }
     
@@ -258,7 +260,6 @@ extension ListViewController: SwipeTableViewCellDelegate {
         dpVC.modalPresentationStyle = .overCurrentContext
         dpVC.setReminder = setReminder
         self.present(dpVC, animated: true, completion: nil)
-        tableView.reloadData()
     }
     
     //sends the notification to user to remind the list
@@ -296,48 +297,18 @@ extension ListViewController: SwipeTableViewCellDelegate {
         chosenRow = indexpath.row
         chosenNameforCalendar = lists![indexpath.row].name
         
-        let dpVC = DatePickerPopupViewController()
+        
         dpVC.modalPresentationStyle = .overCurrentContext
-        
-        
         dpVC.dateForCalendar = true
-        
         dpVC.saveEventToCalendar = saveEventToCalendar
         self.present(dpVC, animated: true, completion: nil)
-        tableView.reloadData()
     }
     
-    func saveEventToCalendar(_ date: Date) ->(){
-        
-        let eventStore = EKEventStore()
-        
-        eventStore.requestAccess(to: .event) { (granted, error) in
-            if granted {
-                let event = EKEvent(eventStore: eventStore)
-                
-                event.title = self.chosenNameforCalendar
-                event.startDate = date
-                event.endDate = date.addingTimeInterval(3600)
-                event.calendar = eventStore.defaultCalendarForNewEvents
-                do  {
-                    try eventStore.save(event, span: .thisEvent)
-                }catch{
-                    print("error saving the event\(error)")
-                }
-                
-            }else{
-                print("error getting access to calendar\(error!)")
-            }
-        }
-    }
+
     
     //strikes out the text
-    
     func strikeOut(at indexPath: IndexPath) {
-        
         if let itemForUpdate = self.lists?[indexPath.row] {
-            
-            //changing the done property
             do {
                 try realm.write {
                     itemForUpdate.done = !itemForUpdate.done
@@ -357,15 +328,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         save(list: liste)
         tableView.reloadData()
     }
-//    ///adds icon to a liste and saves iconName in Realm
-//    func addIconNameToListe (_ iconName: String)->() {
-//        let newListe = Liste()
-//        newListe.iconName = iconName
-//        sa
-//    }
 
-    
-    
     func threeHardCodedExamples () {
         let fisrtListe = Liste()
         fisrtListe.name = "Shopping list"
@@ -396,6 +359,85 @@ extension ListViewController: SwipeTableViewCellDelegate {
             print("App launched first time")
             return false
         }
+    }
+    //MARK: - EVENTKIT AND CALENDAR METHODS
+    
+
+    
+    func saveEventToCalendar(_ date: Date) ->(){
+        checkCalendarAuthorizationStatus(date)
+        
+
+    }
+    
+    func checkCalendarAuthorizationStatus(_ date: Date) {
+        let eventStore = EKEventStore()
+        
+        let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
+        
+        switch (status) {
+        case EKAuthorizationStatus.notDetermined:
+            // This happens on first-run
+            firstTimeAccessToCalendar(date, eventStore: eventStore)
+        case EKAuthorizationStatus.authorized:
+            // Things are in line with being able to show the calendars in the table view
+            accessGranted(eventStore, date)
+        case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
+            // We need to help them give us permission
+            dpVC.dismiss(animated: true, completion: nil)
+            goToSettingsAllert()
+        }
+    }
+    
+    func firstTimeAccessToCalendar (_ date: Date, eventStore: EKEventStore) {
+        
+        eventStore.requestAccess(to: .event) {[weak self] (granted, error) in
+            if granted {
+                self?.accessGranted(eventStore, date)
+            }else{
+                self?.goToSettingsAllert()
+                //print("error getting access to calendar\(error!)")
+            }
+        }
+    }
+    
+    func accessGranted (_ eventStoreLocal: EKEventStore, _ date: Date) {
+        let event = EKEvent(eventStore: eventStoreLocal)
+        
+        event.title = self.chosenNameforCalendar
+        event.startDate = date
+        event.endDate = date.addingTimeInterval(3600)
+        event.calendar = eventStoreLocal.defaultCalendarForNewEvents
+        do  {
+            try eventStoreLocal.save(event, span: .thisEvent)
+        }catch{
+            print("error saving the event\(error)")
+        }
+    }
+    
+
+ 
+    
+    func goToSettingsAllert () {
+        print("-->Go to settings alert")
+                let alert = UIAlertController(title: settingsAlertTitle, message: settingsAlertMessage, preferredStyle: .alert)
+        
+        let settingsAction = UIAlertAction(title: "Settings", style: .default) { (action) in
+            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
+                return
+            }
+            if UIApplication.shared.canOpenURL(settingsURL) {
+                UIApplication.shared.open(settingsURL, completionHandler: { (success) in
+                    print("Settings opened: \(success)")
+                })
+            }
+        }
+        alert.addAction(settingsAction)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
     }
 }
 

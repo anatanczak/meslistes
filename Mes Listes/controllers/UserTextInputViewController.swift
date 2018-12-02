@@ -105,7 +105,7 @@ class UserTextInputViewController: UIViewController {
         textFieldForInput.layer.borderWidth = 0.5
         textFieldForInput.layer.borderColor = colorize(hex: 0xC8C7CC).cgColor
         textFieldForInput.font = UIFont.systemFont(ofSize: 13)
-        
+        textFieldForInput.returnKeyType = .done
 
         //subViewForCollectionView
         subViewForCollectionView.backgroundColor = .clear

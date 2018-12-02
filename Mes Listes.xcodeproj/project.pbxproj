@@ -23,7 +23,6 @@
 		4C25004A2139C134004215D8 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2500492139C134004215D8 /* UIView.swift */; };
 		4C25004C213C7D24004215D8 /* UIButton + Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C25004B213C7D24004215D8 /* UIButton + Border.swift */; };
 		4C25E0C720ED3564003AF851 /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C25E0C620ED3564003AF851 /* NoteViewController.swift */; };
-		4C8E0D492147E0FD00214308 /* TextInputForItemVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8E0D482147E0FD00214308 /* TextInputForItemVC.swift */; };
 		4CA5BE312126E9EA00EB6457 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE302126E9EA00EB6457 /* Coordinator.swift */; };
 		4CA5BE342126FB1100EB6457 /* ListeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */; };
 		4CA5BE3C2127772D00EB6457 /* Fontfabric.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5BE3B2127772D00EB6457 /* Fontfabric.otf */; };
@@ -52,7 +51,6 @@
 		4C2500492139C134004215D8 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		4C25004B213C7D24004215D8 /* UIButton + Border.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton + Border.swift"; sourceTree = "<group>"; };
 		4C25E0C620ED3564003AF851 /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
-		4C8E0D482147E0FD00214308 /* TextInputForItemVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInputForItemVC.swift; sourceTree = "<group>"; };
 		4CA5BE302126E9EA00EB6457 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BE3B2127772D00EB6457 /* Fontfabric.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontfabric.otf; sourceTree = "<group>"; };
@@ -120,7 +118,6 @@
 		4C239AAA20D51B9A004A0089 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
-				4C8E0D482147E0FD00214308 /* TextInputForItemVC.swift */,
 				4C239AA520D51B73004A0089 /* ListViewController.swift */,
 				4C1DFC0720DFEBB200F3D459 /* ItemTableViewController.swift */,
 				4C25E0C620ED3564003AF851 /* NoteViewController.swift */,
@@ -339,7 +336,6 @@
 				4C239AA620D51B73004A0089 /* Liste.swift in Sources */,
 				4CA5BE43212AFE1700EB6457 /* ViewController.swift in Sources */,
 				4CA5BE342126FB1100EB6457 /* ListeTableViewCell.swift in Sources */,
-				4C8E0D492147E0FD00214308 /* TextInputForItemVC.swift in Sources */,
 				63F0143F2145048A00465256 /* UIScrollView+Extension.swift in Sources */,
 				4C25004A2139C134004215D8 /* UIView.swift in Sources */,
 				4C1DFC0820DFEBB200F3D459 /* ItemTableViewController.swift in Sources */,
