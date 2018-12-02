@@ -14,13 +14,15 @@ import SwipeCellKit
 
 class ItemTableViewController: UIViewController {
     //MARK: - Constants
-    let textFieldPlaceholderText = "Type your item here..."
-    let textFieldHeight: CGFloat = 40
-    let textFieldAndPlusButtonPadding: CGFloat = 10
-    let subviewTextFiledPaddingRightLeft: CGFloat = 5
-    let distanceBetweenTextfieldAndTableView: CGFloat = 10
-    let borderSubView: CGFloat = 1
-    
+    private let textFieldPlaceholderText = "Type your item here..."
+    private let textFieldHeight: CGFloat = 40
+    private let textFieldAndPlusButtonPadding: CGFloat = 10
+    private let subviewTextFiledPaddingRightLeft: CGFloat = 5
+    private let distanceBetweenTextfieldAndTableView: CGFloat = 10
+    private let borderSubView: CGFloat = 1
+    private let settingsAlertTitle = "We need your permission"
+    private let settingsAlertMessage = "Change your settings"
+    private let chosenNameforCalendar = ""
     //MARK: - Properties
     let realm = try! Realm()
     var items : Results <Item>?
@@ -29,7 +31,7 @@ class ItemTableViewController: UIViewController {
     var selectedItemForTheCalendar = ""
     var isSwipeRightEnabled = true
     let backgroundImage = #imageLiteral(resourceName: "background-image")
-
+    let dpVC = DatePickerPopupViewController()
     
     let backgroundImageView = UIImageView()
     let subviewForTextFieldAndPlusButton = UIView()
@@ -215,7 +217,83 @@ class ItemTableViewController: UIViewController {
         tableView.reloadData()
     }
     
-
+    //MARK: - EVENTKIT AND CALENDAR METHODS
+    
+    func saveEventToCalendar(_ date: Date) ->(){
+        checkCalendarAuthorizationStatus(date)
+        
+        
+    }
+    
+    func checkCalendarAuthorizationStatus(_ date: Date) {
+        let eventStore = EKEventStore()
+        
+        let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
+        
+        switch (status) {
+        case EKAuthorizationStatus.notDetermined:
+            // This happens on first-run
+            firstTimeAccessToCalendar(date, eventStore: eventStore)
+        case EKAuthorizationStatus.authorized:
+            // Things are in line with being able to show the calendars in the table view
+            accessGranted(eventStore, date)
+        case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
+            // We need to help them give us permission
+            dpVC.dismiss(animated: true, completion: nil)
+            goToSettingsAllert()
+        }
+    }
+    
+    func firstTimeAccessToCalendar (_ date: Date, eventStore: EKEventStore) {
+        
+        eventStore.requestAccess(to: .event) {[weak self] (granted, error) in
+            if granted {
+                self?.accessGranted(eventStore, date)
+            }else{
+                self?.goToSettingsAllert()
+                //print("error getting access to calendar\(error!)")
+            }
+        }
+    }
+    
+    func accessGranted (_ eventStoreLocal: EKEventStore, _ date: Date) {
+        let event = EKEvent(eventStore: eventStoreLocal)
+        
+        event.title = self.chosenNameforCalendar
+        event.startDate = date
+        event.endDate = date.addingTimeInterval(3600)
+        event.calendar = eventStoreLocal.defaultCalendarForNewEvents
+        do  {
+            try eventStoreLocal.save(event, span: .thisEvent)
+        }catch{
+            print("error saving the event\(error)")
+        }
+    }
+    
+    
+    
+    
+    func goToSettingsAllert () {
+        print("-->Go to settings alert")
+        let alert = UIAlertController(title: settingsAlertTitle, message: settingsAlertMessage, preferredStyle: .alert)
+        
+        let settingsAction = UIAlertAction(title: "Settings", style: .default) { (action) in
+            guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
+                return
+            }
+            if UIApplication.shared.canOpenURL(settingsURL) {
+                UIApplication.shared.open(settingsURL, completionHandler: { (success) in
+                    print("Settings opened: \(success)")
+                })
+            }
+        }
+        alert.addAction(settingsAction)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alert.addAction(cancelAction)
+        
+        present(alert, animated: true, completion: nil)
+    }
     
 }
 // MARK: - TABLE VIEW DELEGATE METHODS DATA SOURCE
@@ -371,28 +449,6 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         self.present(dpVC, animated: true, completion: nil)
     }
     
-    func saveEventToCalendar(_ date: Date) ->(){
-        
-        let eventStore = EKEventStore()
-        
-        eventStore.requestAccess(to: .event) { (granted, error) in
-            if granted {
-                let event = EKEvent(eventStore: eventStore)
-                
-                event.title = self.selectedItemForTheCalendar
-                event.startDate = date
-                event.endDate = date.addingTimeInterval(3600)
-                event.calendar = eventStore.defaultCalendarForNewEvents
-                do  {
-                    try eventStore.save(event, span: .thisEvent)
-                }catch{
-                    print("error saving the event\(error)")
-                }
-            }else{
-                print("error getting access to calendar\(error!)")
-            }
-        }
-    }
     
     //strikes out the text
     func strikeOut(at indexPath: IndexPath) {
@@ -407,6 +463,8 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         }
     }
 }
+
+
 //MARK: - TextField Method
 
 extension ItemTableViewController: UITextFieldDelegate {
