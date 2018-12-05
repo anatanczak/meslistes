@@ -18,8 +18,12 @@ class ListViewController: UIViewController {
     //MARK: - Constants
     private let cellHeight: CGFloat = 70
     private let titleFontSize: CGFloat = 28.5
-    private let settingsAlertTitle = "We need your permission"
-    private let settingsAlertMessage = "Change your settings"
+    private let settingsAlertTitleCalendar = "We need your permission"
+    private let settingsAlertMessageCalendar = "Change your settings"
+    private var notificationTitle = "Don't forget!"
+    private var notificationBody = ""
+    private let settingsAlertTitleNotification = "We need your permission"
+    private let settingAlertMessageNotification = "Go to settings"
     
     //MARK: - Properties
     let backgroundImageView: UIImageView = UIImageView()
@@ -28,12 +32,13 @@ class ListViewController: UIViewController {
     
     let realm = try! Realm()
     var lists : Results <Liste>?
-    var chosenRow = 0
+    //var chosenRow = 0
     var chosenNameforCalendar = ""
+    var notificationTitleForReminder = ""
     var isSwipeRightEnabled = true
     
-    let dpVC = DatePickerPopupViewController()
-
+    
+    let eventStore = EKEventStore()
     
     //MARK: - Life Cycle
     override func viewDidLoad() {
@@ -210,7 +215,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             
             //REMINDER
             let setReminder = SwipeAction(style: .default, title: nil) { action, indexPath in
-                self.updateModelByAddingAReminder(at: indexPath)
+                self.addReminder(at: indexPath)
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
@@ -252,32 +257,14 @@ extension ListViewController: SwipeTableViewCellDelegate {
         return options
     }
     
-    func updateModelByAddingAReminder(at indexpath: IndexPath) {
+    func addReminder(at indexpath: IndexPath) {
         
-        chosenRow = indexpath.row
+        notificationTitle = lists![indexpath.row].name
         
-        let dpVC = DatePickerPopupViewController()
-        dpVC.modalPresentationStyle = .overCurrentContext
-        dpVC.setReminder = setReminder
-        self.present(dpVC, animated: true, completion: nil)
+        getNotificationSettingStatus()
     }
     
-    //sends the notification to user to remind the list
-    func setReminder (_ components: DateComponents) ->(){
-        
-        let content = UNMutableNotificationContent()
-        content.title = "Don't forget!!!"
-        content.body = lists![chosenRow].name
-        content.sound = UNNotificationSound.default
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { (error) in
-            if let error = error {
-                print(" We had an error: \(error)")
-            }
-        }
-    }
+
     
     //deletes the list
     func deleteListe (at indexpath: IndexPath) {
@@ -297,11 +284,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         chosenRow = indexpath.row
         chosenNameforCalendar = lists![indexpath.row].name
         
-        
-        dpVC.modalPresentationStyle = .overCurrentContext
-        dpVC.dateForCalendar = true
-        dpVC.saveEventToCalendar = saveEventToCalendar
-        self.present(dpVC, animated: true, completion: nil)
+        checkCalendarAuthorizationStatus()
     }
     
 
@@ -360,67 +343,70 @@ extension ListViewController: SwipeTableViewCellDelegate {
             return false
         }
     }
+    
     //MARK: - EVENTKIT AND CALENDAR METHODS
-    
 
-    
-    func saveEventToCalendar(_ date: Date) ->(){
-        checkCalendarAuthorizationStatus(date)
+    func goToPopupAndSaveEvent () {
+        //popup
         
+        let dpVC = DatePickerPopupViewController()
+        dpVC.modalPresentationStyle = .overCurrentContext
+        dpVC.dateForCalendar = true
+        dpVC.saveEventToCalendar = saveEventToCalendar
+        self.present(dpVC, animated: true, completion: nil)
+        
+        
+    }
+    func saveEventToCalendar(_ date: Date) ->(){
 
+        
+        let event = EKEvent(eventStore: eventStore)
+        
+        event.title = self.chosenNameforCalendar
+        event.startDate = date
+        event.endDate = date.addingTimeInterval(3600)
+        event.calendar = eventStore.defaultCalendarForNewEvents
+        do  {
+            try eventStore.save(event, span: .thisEvent)
+        }catch{
+            print("error saving the event\(error)")
+        }
     }
     
-    func checkCalendarAuthorizationStatus(_ date: Date) {
-        let eventStore = EKEventStore()
+    func checkCalendarAuthorizationStatus() {
+        
         
         let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
         
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             // This happens on first-run
-            firstTimeAccessToCalendar(date, eventStore: eventStore)
+            firstTimeAccessToCalendar()
         case EKAuthorizationStatus.authorized:
             // Things are in line with being able to show the calendars in the table view
-            accessGranted(eventStore, date)
+            goToPopupAndSaveEvent()
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            dpVC.dismiss(animated: true, completion: nil)
-            goToSettingsAllert()
+            
+            goToSettingsAllert(alertTitle: settingsAlertTitleCalendar, alertMessage: settingsAlertMessageCalendar)
         }
     }
     
-    func firstTimeAccessToCalendar (_ date: Date, eventStore: EKEventStore) {
+    func firstTimeAccessToCalendar () {
         
         eventStore.requestAccess(to: .event) {[weak self] (granted, error) in
             if granted {
-                self?.accessGranted(eventStore, date)
+                self?.goToPopupAndSaveEvent()
             }else{
-                self?.goToSettingsAllert()
-                //print("error getting access to calendar\(error!)")
+                self?.goToSettingsAllert(alertTitle: self!.settingsAlertTitleCalendar, alertMessage: self!.settingsAlertMessageCalendar)
             }
         }
     }
     
-    func accessGranted (_ eventStoreLocal: EKEventStore, _ date: Date) {
-        let event = EKEvent(eventStore: eventStoreLocal)
-        
-        event.title = self.chosenNameforCalendar
-        event.startDate = date
-        event.endDate = date.addingTimeInterval(3600)
-        event.calendar = eventStoreLocal.defaultCalendarForNewEvents
-        do  {
-            try eventStoreLocal.save(event, span: .thisEvent)
-        }catch{
-            print("error saving the event\(error)")
-        }
-    }
-    
 
- 
-    
-    func goToSettingsAllert () {
-        print("-->Go to settings alert")
-                let alert = UIAlertController(title: settingsAlertTitle, message: settingsAlertMessage, preferredStyle: .alert)
+    func goToSettingsAllert (alertTitle: String, alertMessage: String) {
+        
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         
         let settingsAction = UIAlertAction(title: "Settings", style: .default) { (action) in
             guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
@@ -440,5 +426,49 @@ extension ListViewController: SwipeTableViewCellDelegate {
         present(alert, animated: true, completion: nil)
     }
     
+    //MARK: - NOTIFICATION CENTER MATHODS (REMINDERS)
     
+    func getNotificationSettingStatus () {
+
+        UNUserNotificationCenter.current().getNotificationSettings {[weak self] (settings) in
+
+            switch settings.authorizationStatus {
+            case .authorized:
+                self!.goToPopupAndSetReminder()
+
+            case .denied:
+                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
+            case .notDetermined:
+                print("casenotDetermined is highly unlikely")
+            case .provisional:
+                print("caseProvisional is highly unlikely")
+            }
+        }
+    }
+
+
+    
+    func goToPopupAndSetReminder () {
+        let dpVC = DatePickerPopupViewController()
+        dpVC.dateForCalendar = false
+        dpVC.modalPresentationStyle = .overCurrentContext
+        dpVC.setReminder = setReminder
+        self.present(dpVC, animated: true, completion: nil)
+    }
+    
+    func setReminder (_ components: DateComponents) ->(){
+        
+        let content = UNMutableNotificationContent()
+        content.title = notificationTitle
+        content.body = notificationBody
+        content.sound = UNNotificationSound.default
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { (error) in
+            if let error = error {
+                print(" We had an error: \(error)")
+            }
+        }
+    }
 }

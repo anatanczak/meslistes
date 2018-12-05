@@ -20,18 +20,25 @@ class ItemTableViewController: UIViewController {
     private let subviewTextFiledPaddingRightLeft: CGFloat = 5
     private let distanceBetweenTextfieldAndTableView: CGFloat = 10
     private let borderSubView: CGFloat = 1
-    private let settingsAlertTitle = "We need your permission"
-    private let settingsAlertMessage = "Change your settings"
-    private let chosenNameforCalendar = ""
+    private let settingsAlertTitleCalendar = "We need your permission"
+    private let settingsAlertMessageCalendar = "Change your settings"
+    private let settingsAlertTitleNotification = "We need your permission"
+    private let settingAlertMessageNotification = "Go to settings"
+    private var chosenNameforCalendar = ""
+    private var notificationTitle = ""
+    private var notificationBody = ""
+    //private var rowForSelectedItem = 0
+    
     //MARK: - Properties
     let realm = try! Realm()
     var items : Results <Item>?
-    var rowForSelectedItem = 0
+    
     var nameOfTheSelectedListe = ""
-    var selectedItemForTheCalendar = ""
+    
     var isSwipeRightEnabled = true
     let backgroundImage = #imageLiteral(resourceName: "background-image")
-    let dpVC = DatePickerPopupViewController()
+
+    let eventStore = EKEventStore()
     
     let backgroundImageView = UIImageView()
     let subviewForTextFieldAndPlusButton = UIView()
@@ -219,63 +226,67 @@ class ItemTableViewController: UIViewController {
     
     //MARK: - EVENTKIT AND CALENDAR METHODS
     
-    func saveEventToCalendar(_ date: Date) ->(){
-        checkCalendarAuthorizationStatus(date)
+    func goToPopupAndSaveEvent () {
+        //popup
+        
+        let dpVC = DatePickerPopupViewController()
+        dpVC.modalPresentationStyle = .overCurrentContext
+        dpVC.dateForCalendar = true
+        dpVC.saveEventToCalendar = saveEventToCalendar
+        self.present(dpVC, animated: true, completion: nil)
         
         
     }
+    func saveEventToCalendar(_ date: Date) ->(){
+        
+        
+        let event = EKEvent(eventStore: eventStore)
+        
+        event.title = self.chosenNameforCalendar
+        event.startDate = date
+        event.endDate = date.addingTimeInterval(3600)
+        event.calendar = eventStore.defaultCalendarForNewEvents
+        do  {
+            try eventStore.save(event, span: .thisEvent)
+        }catch{
+            print("error saving the event\(error)")
+        }
+    }
     
-    func checkCalendarAuthorizationStatus(_ date: Date) {
-        let eventStore = EKEventStore()
+    func checkCalendarAuthorizationStatus() {
+        
         
         let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
         
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             // This happens on first-run
-            firstTimeAccessToCalendar(date, eventStore: eventStore)
+            firstTimeAccessToCalendar()
         case EKAuthorizationStatus.authorized:
             // Things are in line with being able to show the calendars in the table view
-            accessGranted(eventStore, date)
+            goToPopupAndSaveEvent()
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            dpVC.dismiss(animated: true, completion: nil)
-            goToSettingsAllert()
+            
+            goToSettingsAllert(alertTitle: settingsAlertTitleCalendar, alertMessage: settingsAlertMessageCalendar)
         }
     }
     
-    func firstTimeAccessToCalendar (_ date: Date, eventStore: EKEventStore) {
+    func firstTimeAccessToCalendar () {
         
         eventStore.requestAccess(to: .event) {[weak self] (granted, error) in
             if granted {
-                self?.accessGranted(eventStore, date)
+                self?.goToPopupAndSaveEvent()
             }else{
-                self?.goToSettingsAllert()
-                //print("error getting access to calendar\(error!)")
+                self?.goToSettingsAllert(alertTitle: self!.settingsAlertTitleCalendar, alertMessage: self!.settingsAlertMessageCalendar)
             }
         }
     }
     
-    func accessGranted (_ eventStoreLocal: EKEventStore, _ date: Date) {
-        let event = EKEvent(eventStore: eventStoreLocal)
+    
+    func goToSettingsAllert (alertTitle: String, alertMessage: String) {
         
-        event.title = self.chosenNameforCalendar
-        event.startDate = date
-        event.endDate = date.addingTimeInterval(3600)
-        event.calendar = eventStoreLocal.defaultCalendarForNewEvents
-        do  {
-            try eventStoreLocal.save(event, span: .thisEvent)
-        }catch{
-            print("error saving the event\(error)")
-        }
-    }
-    
-    
-    
-    
-    func goToSettingsAllert () {
-        print("-->Go to settings alert")
-        let alert = UIAlertController(title: settingsAlertTitle, message: settingsAlertMessage, preferredStyle: .alert)
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         
         let settingsAction = UIAlertAction(title: "Settings", style: .default) { (action) in
             guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
@@ -293,6 +304,51 @@ class ItemTableViewController: UIViewController {
         alert.addAction(cancelAction)
         
         present(alert, animated: true, completion: nil)
+    }
+    //MARK: - NOTIFICATION CENTER MATHODS (REMINDERS)
+    
+    func getNotificationSettingStatus () {
+        
+        UNUserNotificationCenter.current().getNotificationSettings {[weak self] (settings) in
+            
+            switch settings.authorizationStatus {
+            case .authorized:
+                self!.goToPopupAndSetReminder()
+                
+            case .denied:
+                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
+            case .notDetermined:
+                print("casenotDetermined is highly unlikely")
+            case .provisional:
+                print("caseProvisional is highly unlikely")
+            }
+        }
+    }
+    
+    
+    
+    func goToPopupAndSetReminder () {
+        let dpVC = DatePickerPopupViewController()
+        dpVC.dateForCalendar = false
+        dpVC.modalPresentationStyle = .overCurrentContext
+        dpVC.setReminder = setReminder
+        self.present(dpVC, animated: true, completion: nil)
+    }
+    // sends the notification to user to remind the list
+    func setReminder (_ components: DateComponents) ->(){
+        
+        let content = UNMutableNotificationContent()
+        content.title = notificationTitle
+        content.body = notificationBody
+        content.sound = UNNotificationSound.default
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { (error) in
+            if let error = error {
+                print(" We had an error: \(error)")
+            }
+        }
     }
     
 }
@@ -412,41 +468,20 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     
     func updateModelByAddingAReminder(at indexpath: IndexPath) {
         
-        rowForSelectedItem = indexpath.row
+//        rowForSelectedItem = indexpath.row
+        notificationTitle = items![indexpath.row].title
         
-        let dpVC = DatePickerPopupViewController()
-        dpVC.modalPresentationStyle = .overCurrentContext
-        dpVC.setReminder = setReminder
-        self.present(dpVC, animated: true, completion: nil)
+        getNotificationSettingStatus()
     }
     
-    // sends the notification to user to remind the list
-    func setReminder (_ components: DateComponents) ->(){
-        
-        let content = UNMutableNotificationContent()
-        content.title = "Don't forget!!!"
-        content.body = items![rowForSelectedItem].title
-        content.sound = UNNotificationSound.default
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
-        
-        UNUserNotificationCenter.current().add(request) { (error) in
-            if let error = error {
-                print(" We had an error: \(error)")
-            }
-        }
-    }
+
     
     func addEventToCalendar(at indexpath: IndexPath) {
         
-        rowForSelectedItem = indexpath.row
-        selectedItemForTheCalendar = items![indexpath.row].title
+//        rowForSelectedItem = indexpath.row
+        chosenNameforCalendar = items![indexpath.row].title
         
-        let dpVC = DatePickerPopupViewController()
-        dpVC.modalPresentationStyle = .overCurrentContext
-        dpVC.dateForCalendar = true
-        dpVC.saveEventToCalendar = saveEventToCalendar
-        self.present(dpVC, animated: true, completion: nil)
+        checkCalendarAuthorizationStatus()
     }
     
     
