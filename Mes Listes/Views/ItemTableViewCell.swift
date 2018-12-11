@@ -9,6 +9,11 @@
 import UIKit
 import SwipeCellKit
 
+protocol ItemCellProtocol: class
+{
+    func cellDidTapOnButton(at index: IndexPath)
+}
+
 class ItemTableViewCell: SwipeTableViewCell {
     
     //MARK: - Constants
@@ -18,13 +23,17 @@ class ItemTableViewCell: SwipeTableViewCell {
     private let paddingTopBottom: CGFloat = 13
     private let iconViewWidthHeight: CGFloat = 12
     private let upperTransparentBorder: CGFloat = 1
-    private let photoButtonHeight: CGFloat = 20
-    private let photoButtonWidth: CGFloat = 25
-
+    private let photoButtonHeightWidth: CGFloat = 27
+    
+    //MARK: - Properties
+    weak var itemDelegate: ItemCellProtocol?
+    var indexpath: IndexPath?
+    
     //MARK: - Views
     var backgroundCellView = UIView()
     let iconView = UIImageView()
     let titleLabel = UILabel()
+    let photoButton = UIButton()
 
     
     //MARK: - Implementation
@@ -66,6 +75,9 @@ class ItemTableViewCell: SwipeTableViewCell {
         titleLabel.numberOfLines = 0
         backgroundCellView.addSubview(titleLabel)
         
+        //photoButton
+        photoButton.addTarget(self, action: #selector(photoButtonAction), for: .touchUpInside)
+        backgroundCellView.addSubview(photoButton)
     }
     
     func setupLayout () {
@@ -87,8 +99,7 @@ class ItemTableViewCell: SwipeTableViewCell {
             iconView.widthAnchor.constraint(equalToConstant: iconViewWidthHeight),
             iconView.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor)
         ])
-        
-    
+
         //titleLabel
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
 
@@ -96,13 +107,29 @@ class ItemTableViewCell: SwipeTableViewCell {
             titleLabel.topAnchor.constraint(equalTo: backgroundCellView.topAnchor, constant: paddingTopBottom),
             titleLabel.bottomAnchor.constraint(equalTo: backgroundCellView.bottomAnchor, constant: -paddingTopBottom),
             titleLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor , constant: leadingTrailingPaddingTitlelabel ),
-            titleLabel.trailingAnchor.constraint(equalTo: backgroundCellView.trailingAnchor, constant: -paddingTrailing)
+            //titleLabel.trailingAnchor.constraint(equalTo: backgroundCellView.trailingAnchor, constant: -paddingTrailing)
+            ])
+        
+        //photoButton
+        photoButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            photoButton.widthAnchor.constraint(equalToConstant: photoButtonHeightWidth),
+            photoButton.heightAnchor.constraint(equalToConstant: photoButtonHeightWidth),
+            photoButton.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor , constant: leadingTrailingPaddingTitlelabel ),
+            photoButton.trailingAnchor.constraint(equalTo: backgroundCellView.trailingAnchor, constant: -paddingTrailing),
+            photoButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor)
             ])
         
     }
     
     //MARK: - DIFFERENT METHODS
-    
+    @objc func photoButtonAction ()
+    {
+        if let indexPathUnwrapped = indexpath {
+        itemDelegate?.cellDidTapOnButton(at: indexPathUnwrapped)
+        }
+    }
     func fillWith(model: Item?) {
                 if let item = model {
         
@@ -122,6 +149,17 @@ class ItemTableViewCell: SwipeTableViewCell {
                         iconView.image = #imageLiteral(resourceName: "black-emty-circle-icon")
                     }
                     
+                    if item.hasImage == true
+                    {
+                        photoButton.isHidden = false
+                        //retireve the image and add it as the background
+                        let image = getImage(imageName: item.imageName)
+                        photoButton.setImage(image, for: .normal)
+                    }
+                    else
+                    {
+                        photoButton.isHidden = true
+                    }
                 }else{
                     titleLabel.text = "You haven't created an item yet"
                 }
@@ -129,8 +167,27 @@ class ItemTableViewCell: SwipeTableViewCell {
         
     }
     
+        func getImage(imageName : String)-> UIImage {
+                let fileManager = FileManager.default
+                // Here using getDirectoryPath method to get the Directory path
+                let imagePath = (self.getDirectoryPath() as NSString).appendingPathComponent(imageName)
+                if fileManager.fileExists(atPath: imagePath){
+                    return UIImage(contentsOfFile: imagePath)!
+                }else{
+                    print("No Image available")
+                    return UIImage.init(named: "placeholder.png")! // Return placeholder image here
+                }
+            }
+    
+            func getDirectoryPath() -> String {
+                let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+                let documentsDirectory = paths[0]
+                return documentsDirectory
+            }
+    
     override func prepareForReuse() {
         titleLabel.text = nil
         iconView.image = nil
+        photoButton.setBackgroundImage(nil, for: .normal)
     }
 }

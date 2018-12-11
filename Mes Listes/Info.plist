@@ -23,11 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCalendarsUsageDescription</key>
-	<string>App needs to access the calendar app</string>
+	<string>This app saves ivents in users calendar</string>
 	<key>NSCameraUsageDescription</key>
-	<string>App needs to access your camera</string>
-	<key>NSPrincipalClass</key>
-	<string></string>
+	<string>This app uses the camera to take photos</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Fontfabric.otf</string>

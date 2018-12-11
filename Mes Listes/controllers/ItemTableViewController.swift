@@ -11,6 +11,7 @@ import RealmSwift
 import UserNotifications
 import EventKit
 import SwipeCellKit
+import AVFoundation
 
 class ItemTableViewController: UIViewController {
     //MARK: - Constants
@@ -20,10 +21,12 @@ class ItemTableViewController: UIViewController {
     private let subviewTextFiledPaddingRightLeft: CGFloat = 5
     private let distanceBetweenTextfieldAndTableView: CGFloat = 10
     private let borderSubView: CGFloat = 1
-    private let settingsAlertTitleCalendar = "We need your permission"
-    private let settingsAlertMessageCalendar = "Change your settings"
-    private let settingsAlertTitleNotification = "We need your permission"
-    private let settingAlertMessageNotification = "Go to settings"
+    private let settingsAlertTitleCalendar = "The calendar permission was not authorized"
+    private let settingsAlertMessageCalendar = "Please enable it in Settings to continue"
+    private let settingsAlertTitleNotification = "Unable to use notifications"
+    private let settingAlertMessageNotification = "Please go to Setting to change your preferences"
+    private let settingAlertTitleCamera = "The camera permission was denied"
+    private let settingAlertMessageCamera = "Please enable it in Settings to continue"
     private var chosenNameforCalendar = ""
     private var notificationTitle = ""
     private var notificationBody = ""
@@ -33,7 +36,11 @@ class ItemTableViewController: UIViewController {
     let realm = try! Realm()
     var items : Results <Item>?
     
+    //get access to shared instance of the file manager
+    let fileManager = FileManager.default
+    
     var nameOfTheSelectedListe = ""
+    var selectedRowToAddTheImage: Int?
     
     var isSwipeRightEnabled = true
     let backgroundImage = #imageLiteral(resourceName: "background-image")
@@ -51,6 +58,8 @@ class ItemTableViewController: UIViewController {
             loadItems()
         }
     }
+    
+    private var imagePicker = UIImagePickerController()
 
     //MARK: - Life Cycle
     
@@ -64,6 +73,8 @@ class ItemTableViewController: UIViewController {
         setupNavigationBar()
         setupViews()
         setupLayout()
+        
+        imagePicker.delegate = self
         
     }
     
@@ -125,6 +136,7 @@ class ItemTableViewController: UIViewController {
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableView.automaticDimension
         view.addSubview(tableView)
+        
     }
     
     private func setupLayout() {
@@ -200,6 +212,7 @@ class ItemTableViewController: UIViewController {
                 do {
                     try self.realm.write {
                         let newItem = Item()
+                        newItem.id = UUID().uuidString
                         newItem.title = textFieldItems.text!
                         currentListe.items.append(newItem)
                     }
@@ -319,8 +332,10 @@ class ItemTableViewController: UIViewController {
                 self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             case .notDetermined:
                 print("casenotDetermined is highly unlikely")
+                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             case .provisional:
                 print("caseProvisional is highly unlikely")
+                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             }
         }
     }
@@ -372,15 +387,33 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemTableViewCell", for: indexPath) as! ItemTableViewCell
         cell.delegate = self
+        cell.itemDelegate = self
         cell.fillWith(model: items?[indexPath.row])
         cell.titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
         cell.titleLabel.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = UIColor.clear
         cell.titleLabel.numberOfLines = 0
+        cell.indexpath = indexPath
         
         return cell
     }
     
+}
+
+//MARK: - ItemCell Button Actions
+
+extension ItemTableViewController: ItemCellProtocol {
+    
+    func cellDidTapOnButton(at index: IndexPath) {
+    
+        print("buton tapped")
+        if let currentItem = items?[index.row] {
+            let imageVC = ImageVC()
+            imageVC.imageName = currentItem.imageName
+            imageVC.modalPresentationStyle = .overCurrentContext
+            present(imageVC, animated: true)
+        }
+    }
 }
 
     //MARK: - METHODS FOR SWIPE ACTIONS
@@ -422,19 +455,21 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         }else{
              //DELETE
             let deleteAction = SwipeAction(style: .destructive, title: nil) { action, indexPath in
-                self.updateModel(at: indexPath)
+                self.deleteItem(at: indexPath)
             }
             deleteAction.image = #imageLiteral(resourceName: "delete-item-icon")
             deleteAction.backgroundColor = self.colorize(hex: 0xF25D61)
             
             //take photo
-            let takePhotoAction = SwipeAction(style: .default, title: nil) { (action, indexpath) in
+            let takePhotoAction = SwipeAction(style: .default, title: nil) {[weak self] (action, indexpath) in
                 //take photo action
                 print("photo has been taken")
+               
+                self!.selectedRowToAddTheImage = indexPath.row
+                self!.takePhotoAndSaveIt()
                 
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
-                
             }
             takePhotoAction.backgroundColor = self.colorize(hex: 0xB9CDD6)
             takePhotoAction.image = #imageLiteral(resourceName: "camera-icon")
@@ -454,8 +489,12 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         return options
     }
     
-    func updateModel(at indexpath: IndexPath) {
+    func deleteItem(at indexpath: IndexPath) {
         if let itemForDeletion = self.items?[indexpath.row] {
+            if itemForDeletion.hasImage {
+                deleteImageFromDirectory(named: itemForDeletion.imageName)
+            }
+            
             do {
                 try self.realm.write {
                     self.realm.delete(itemForDeletion)
@@ -497,6 +536,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             }
         }
     }
+    
 }
 
 
@@ -518,6 +558,172 @@ extension ItemTableViewController {
         self.textFieldItems.text = ""
     }
 }
+
+//MARK: - UIImagePicker extension
+extension ItemTableViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+    
+    func takePhotoAndSaveIt ()
+    {
+        alertToChoseCameraOrPhotoLibrary()
+    }
+    
+    func alertToChoseCameraOrPhotoLibrary ()
+    {
+        let alert = UIAlertController(title: "Chose image", message: nil, preferredStyle: .actionSheet)
+        
+        alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { [weak self] (action) in
+            self!.checkForCameraAuthorizationStaturs()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { [weak self] (action) in
+            self!.openGallery()
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(alert, animated: true, completion: nil)
+    }
+    
+    func openCamera()
+    {
+        if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera))
+        {
+            
+            imagePicker.sourceType = UIImagePickerController.SourceType.camera
+            imagePicker.allowsEditing = true
+            self.present(imagePicker, animated: true, completion: nil)
+        }
+        else
+        {
+            let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    func openGallery()
+    {
+        imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
+        imagePicker.allowsEditing = true
+        self.present(imagePicker, animated: true, completion: nil)
+    }
+    
+    func checkForCameraAuthorizationStaturs ()
+    {
+        let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
+        
+        switch cameraAuthorizationStatus
+        {
+        case .notDetermined: requestCameraPermission()
+        case .authorized: openCamera()
+        case .restricted, .denied: goToSettingsAllert(alertTitle: settingAlertTitleCamera, alertMessage: settingAlertMessageCamera)
+        }
+    }
+
+    func requestCameraPermission() {
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: {[weak self] accessGranted in
+            guard accessGranted == true else { return }
+            self!.openCamera()
+        })
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        
+        guard let image = info[.editedImage] as? UIImage else {
+            print("No image found")
+            return
+        }
+        
+        // print out the image size as a test
+        saveImageToDocumentDirectory(named: image)
+        tableView.reloadData()
+        
+    }
+}
+
+//MARK: - File Manager and Saving Photo functions
+
+extension ItemTableViewController
+{
+    func saveImageToDocumentDirectory (named image: UIImage)
+    {
+
+        //get the url for the users home directory
+        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+        //get the URL as a string
+        //let documetnPath = documentsURL.path
+        
+        let itemID = getItemID()
+        //chose random name for the image
+        
+        if let itemIDString = itemID {
+            
+            let nameForImage = "\(itemIDString).png"
+            
+            //create the variable that stores the name
+            let filePath = documentsURL.appendingPathComponent("\(nameForImage)")
+            
+            //save the name to realm
+            saveImageNameAsStringToRealm(nameForImage)
+            
+            //write data
+            do {
+                try UIImage.pngData(image)()!.write(to: filePath)
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    func deleteImageFromDirectory (named name: String) {
+        let imagePath = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent(name)
+        if fileManager.fileExists(atPath: imagePath) {
+            do {
+                try fileManager.removeItem(atPath: imagePath)
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    func saveImageNameAsStringToRealm (_ imageName: String)
+    {
+        if let selectedRow = selectedRowToAddTheImage
+        {
+            if let currentItem = self.items?[selectedRow]
+            {
+                do {
+                    try realm.write
+                    {
+                        currentItem.hasImage = true
+                        currentItem.imageName = imageName
+                    }
+                }
+                catch
+                {
+                    print("error updating realm\(error)")
+                }
+            }
+        }
+    }
+    
+    func getItemID () -> String? {
+        if let selectedRow = selectedRowToAddTheImage {
+            if let currentItem = self.items?[selectedRow] {
+                let itemID = currentItem.id
+                return itemID
+            }
+        }
+        return nil
+    }
+        
+}
+    
+
+
+
 
     
 

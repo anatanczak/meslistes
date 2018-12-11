@@ -22,13 +22,13 @@
 		4C250046212CA3ED004215D8 /* TextFieldPaddingEXT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C250045212CA3ED004215D8 /* TextFieldPaddingEXT.swift */; };
 		4C25004A2139C134004215D8 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2500492139C134004215D8 /* UIView.swift */; };
 		4C25004C213C7D24004215D8 /* UIButton + Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C25004B213C7D24004215D8 /* UIButton + Border.swift */; };
-		4C25E0C720ED3564003AF851 /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C25E0C620ED3564003AF851 /* NoteViewController.swift */; };
 		4CA5BE312126E9EA00EB6457 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE302126E9EA00EB6457 /* Coordinator.swift */; };
 		4CA5BE342126FB1100EB6457 /* ListeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */; };
 		4CA5BE3C2127772D00EB6457 /* Fontfabric.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5BE3B2127772D00EB6457 /* Fontfabric.otf */; };
 		4CA5BE3E2128766900EB6457 /* ItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE3D2128766900EB6457 /* ItemTableViewCell.swift */; };
 		4CA5BE40212876E800EB6457 /* UserTextInputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE3F212876E800EB6457 /* UserTextInputViewController.swift */; };
 		4CA5BE43212AFE1700EB6457 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE42212AFE1700EB6457 /* ViewController.swift */; };
+		4CAE3A7921BFFC6600CFDE65 /* ImageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CAE3A7821BFFC6600CFDE65 /* ImageVC.swift */; };
 		63F0143F2145048A00465256 /* UIScrollView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63F0143E2145048800465256 /* UIScrollView+Extension.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,13 +50,13 @@
 		4C250045212CA3ED004215D8 /* TextFieldPaddingEXT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPaddingEXT.swift; sourceTree = "<group>"; };
 		4C2500492139C134004215D8 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		4C25004B213C7D24004215D8 /* UIButton + Border.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton + Border.swift"; sourceTree = "<group>"; };
-		4C25E0C620ED3564003AF851 /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 		4CA5BE302126E9EA00EB6457 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BE3B2127772D00EB6457 /* Fontfabric.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontfabric.otf; sourceTree = "<group>"; };
 		4CA5BE3D2128766900EB6457 /* ItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BE3F212876E800EB6457 /* UserTextInputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTextInputViewController.swift; sourceTree = "<group>"; };
 		4CA5BE42212AFE1700EB6457 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		4CAE3A7821BFFC6600CFDE65 /* ImageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageVC.swift; sourceTree = "<group>"; };
 		63F0143E2145048800465256 /* UIScrollView+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIScrollView+Extension.swift"; sourceTree = "<group>"; };
 		728AAED0934248CEE6DA1D88 /* Pods-Mes Listes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mes Listes.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Mes Listes/Pods-Mes Listes.debug.xcconfig"; sourceTree = "<group>"; };
 		FDEA6D9EE3FABA11FD24A774 /* Pods-Mes Listes.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Mes Listes.release.xcconfig"; path = "Pods/Target Support Files/Pods-Mes Listes/Pods-Mes Listes.release.xcconfig"; sourceTree = "<group>"; };
@@ -120,7 +120,7 @@
 			children = (
 				4C239AA520D51B73004A0089 /* ListViewController.swift */,
 				4C1DFC0720DFEBB200F3D459 /* ItemTableViewController.swift */,
-				4C25E0C620ED3564003AF851 /* NoteViewController.swift */,
+				4CAE3A7821BFFC6600CFDE65 /* ImageVC.swift */,
 				4CA5BE3F212876E800EB6457 /* UserTextInputViewController.swift */,
 				4C1EB04820D7A0DC0056F1B5 /* DatePickerPopupViewController.swift */,
 				4C2158CA20DC0C7700403BCE /* SwipeTableViewController.swift */,
@@ -325,13 +325,13 @@
 			files = (
 				4C250046212CA3ED004215D8 /* TextFieldPaddingEXT.swift in Sources */,
 				4C25004C213C7D24004215D8 /* UIButton + Border.swift in Sources */,
-				4C25E0C720ED3564003AF851 /* NoteViewController.swift in Sources */,
 				4CA5BE40212876E800EB6457 /* UserTextInputViewController.swift in Sources */,
 				4C239A9220D51B36004A0089 /* AppDelegate.swift in Sources */,
 				4C1EB04920D7A0DC0056F1B5 /* DatePickerPopupViewController.swift in Sources */,
 				4C1C5898212C4E240084AF39 /* AutoLayoutAnchorEXT.swift in Sources */,
 				4C2158CB20DC0C7700403BCE /* SwipeTableViewController.swift in Sources */,
 				4C1DFC0A20DFF91800F3D459 /* Item.swift in Sources */,
+				4CAE3A7921BFFC6600CFDE65 /* ImageVC.swift in Sources */,
 				4C239AA820D51B73004A0089 /* ListViewController.swift in Sources */,
 				4C239AA620D51B73004A0089 /* Liste.swift in Sources */,
 				4CA5BE43212AFE1700EB6457 /* ViewController.swift in Sources */,

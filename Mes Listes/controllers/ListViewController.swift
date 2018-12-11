@@ -281,7 +281,6 @@ extension ListViewController: SwipeTableViewCellDelegate {
     
     func addEventToCalendar(at indexpath: IndexPath) {
         
-        chosenRow = indexpath.row
         chosenNameforCalendar = lists![indexpath.row].name
         
         checkCalendarAuthorizationStatus()
@@ -440,8 +439,10 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             case .notDetermined:
                 print("casenotDetermined is highly unlikely")
+                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             case .provisional:
                 print("caseProvisional is highly unlikely")
+                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             }
         }
     }
@@ -468,6 +469,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         UNUserNotificationCenter.current().add(request) { (error) in
             if let error = error {
                 print(" We had an error: \(error)")
+                
             }
         }
     }
