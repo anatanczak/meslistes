@@ -269,6 +269,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
     //deletes the list
     func deleteListe (at indexpath: IndexPath) {
         if let listForDeletion = self.lists?[indexpath.row]{
+            print(listForDeletion.items)
             do {
                 try self.realm.write {
                     self.realm.delete(listForDeletion)

@@ -84,7 +84,7 @@ class ItemTableViewController: UIViewController {
         let title = selectedListe?.name.uppercased() ?? "meslistes"
         self.title = title
         
-      let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 19, weight: .light), NSAttributedString.Key.foregroundColor: UIColor.black]
+        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 19, weight: .light), NSAttributedString.Key.foregroundColor: UIColor.black]
         navigationController?.navigationBar.titleTextAttributes = attributes
         
         let leftNavigationButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back-button-icon") , style: .plain, target: self, action: #selector(leftBarButtonAction))
@@ -117,7 +117,7 @@ class ItemTableViewController: UIViewController {
         textFieldItems.delegate = self
         textFieldItems.returnKeyType = UIReturnKeyType.next
 
-        textFieldItems.becomeFirstResponder()
+        //textFieldItems.becomeFirstResponder()
         subviewForTextFieldAndPlusButton.addSubview(textFieldItems)
         
         //plusButton

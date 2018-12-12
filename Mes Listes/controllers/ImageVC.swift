@@ -38,7 +38,7 @@ class ImageVC: UIViewController, UIGestureRecognizerDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        UIView.animate(withDuration: 1) {
+        UIView.animate(withDuration: 0.3) {
             self.backgroundColorView.alpha = 1.0
         }
         self.view.layoutIfNeeded()

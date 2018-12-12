@@ -16,7 +16,6 @@ class Item: Object {
     @objc dynamic var important: Bool = false
     @objc dynamic var hasImage: Bool = false
     @objc dynamic var imageName = ""
-    var imagenames = List<String>()
     
 var parentListe = LinkingObjects(fromType: Liste.self, property: "items")
 }
