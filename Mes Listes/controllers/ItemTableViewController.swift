@@ -64,12 +64,27 @@ class ItemTableViewController: UIViewController {
     //MARK: - Life Cycle
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc func keyboardWillShow(notification: Notification) {
+        guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        let convertedFrame = view.convert(keyboardFrame, from: nil)
+        tableView.contentInset.bottom = convertedFrame.height + 50
+    }
+
+    @objc func keyboardWillHide(notification: Notification) {
+        tableView.contentInset.bottom = 0
+        tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
     }
     
     
     override func viewDidLoad() {
+         super.viewDidLoad()
         
-        super.viewDidLoad()
+
         setupNavigationBar()
         setupViews()
         setupLayout()
@@ -77,7 +92,7 @@ class ItemTableViewController: UIViewController {
         imagePicker.delegate = self
         
     }
-    
+
 
     private func setupNavigationBar () {
         
@@ -371,11 +386,7 @@ class ItemTableViewController: UIViewController {
 extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //textFieldItems.resignFirstResponder()
-        //        let currentItem = items?[indexPath.row]
-        //        if currentItem?.hasNote == true {
-        //            performSegue(withIdentifier: "goToNote", sender: self)
-        //        }
+
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -389,10 +400,9 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         cell.delegate = self
         cell.itemDelegate = self
         cell.fillWith(model: items?[indexPath.row])
-        cell.titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
-        cell.titleLabel.adjustsFontForContentSizeCategory = true
+        cell.titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
+        cell.titleTextView.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = UIColor.clear
-        cell.titleLabel.numberOfLines = 0
         cell.indexpath = indexPath
         
         return cell
@@ -414,6 +424,43 @@ extension ItemTableViewController: ItemCellProtocol {
             present(imageVC, animated: true)
         }
     }
+    
+    func changeItemTitleAndSaveItToRealm(at index: IndexPath, newTitle newImput: String) {
+            if let currentItem = items?[index.row] {
+                do {
+                    try realm.write {
+                        currentItem.title = newImput
+                    }
+                } catch {
+                    print("error saving new title to realm\(error)")
+                }
+            }
+    }
+    
+    func updateTableView() {
+        tableView.beginUpdates()
+        tableView.endUpdates()
+    }
+    
+
+    
+
+    
+    
+//    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell) {
+//        //let indexPath = tableView.indexPath(for: cell)
+//        DispatchQueue.main.sync {
+//            //cell.backgroundCellView.backgroundColor = .black
+//        }
+//        
+//        
+//    }
+//    func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell) {
+//        //let indexPath = tableView.indexPath(for: cell)
+//         DispatchQueue.main.sync {
+//        //cell.backgroundCellView.backgroundColor = .blue
+//        }
+//    }
 }
 
     //MARK: - METHODS FOR SWIPE ACTIONS
@@ -623,7 +670,9 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
     func requestCameraPermission() {
         AVCaptureDevice.requestAccess(for: .video, completionHandler: {[weak self] accessGranted in
             guard accessGranted == true else { return }
-            self!.openCamera()
+            DispatchQueue.main.sync {
+                self!.openCamera()
+            }
         })
     }
     

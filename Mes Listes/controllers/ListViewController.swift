@@ -381,6 +381,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         switch (status) {
         case EKAuthorizationStatus.notDetermined:
             // This happens on first-run
+            print("--> fist time authorisation")
             firstTimeAccessToCalendar()
         case EKAuthorizationStatus.authorized:
             // Things are in line with being able to show the calendars in the table view

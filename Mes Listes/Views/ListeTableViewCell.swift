@@ -9,6 +9,11 @@
 import UIKit
 import SwipeCellKit
 
+//protocol ListCellProtocol: class {
+//    func updateTableView ()
+//    func changeListNameAndSaveItToRealm(at index: IndexPath,newName newImput: String)
+//}
+
 class ListeTableViewCell: SwipeTableViewCell {
     
     //MARK: - Constants
@@ -18,6 +23,10 @@ class ListeTableViewCell: SwipeTableViewCell {
     private let iconViewWidthHeight: CGFloat = 40
     private let upperTransparentBorder: CGFloat = 1
 
+//    //MARK: - Properties
+//    weak var listeDelegate: ListCellProtocol?
+//    var indexpath: IndexPath?
+    
     //MARK: - Views
     var backgroundCellView = UIView()
     var iconView = UIImageView()
