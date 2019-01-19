@@ -188,7 +188,7 @@ class UserTextInputViewController: UIViewController {
         //mainView
         mainView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            mainView.heightAnchor.constraint(greaterThanOrEqualToConstant: 180),
+            mainView.heightAnchor.constraint(greaterThanOrEqualToConstant: 1),
             mainView.widthAnchor.constraint(equalToConstant: 270),
             mainView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
             mainView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: -100)
