@@ -10,7 +10,35 @@ import UIKit
 
 class UserTextInputViewController: UIViewController {
    
+    //MARK: Constants
+    
+    
+    let iconNamesArray = ["todo-icon", "star-icon", "airplane-icon", "shopping-cart-icon", "home-icon", "clothes-icon", "gift-icon", "bag-icon", "light-bulb-icon", "sport-icon", "cooking-icon", "book-icon"]
+    
+    let roseIconNamesArray = ["todo-icon-rose", "star-icon-rose", "airplane-icon-rose", "shopping-cart-icon-rose", "home-icon-rose", "clothes-icon-rose", "gift-icon-rose", "bag-icon-rose", "light-bulb-icon-rose", "sport-icon-rose", "cooking-icon-rose", "book-icon-rose"]
+    let alertViewGrayColor = UIColor(red: 224.0/255.0, green: 224.0/255.0, blue: 224.0/255.0, alpha: 1)
+    
+    let textFieldPlaceHolderTextLitteral = "name your new list..."
+    let textFieldPlaceholderTextColor = UIColor.init(red: 140/255, green: 140/255, blue: 140/255, alpha: 1)
+    let textFieldLeftPadding: CGFloat = 10
+    let textFieldBorderWidth: CGFloat = 0.5
+    let textFieldBorderColor = UIColor.init(red: 200/255, green: 199/255, blue: 204/255, alpha: 1)
+    let textFieldFontSize: CGFloat = 18
+    
+    let iconTitleLabelName = "Chose your own icon"
+    let iconTitleLabelTextColor = UIColor.init(red: 180/255, green: 206/255, blue: 215/255, alpha: 1)
+    
+    
+    //MARK: - GLOBAL VARIABLES
+    
+    var createListe: ((_ liste: Liste)->())?
+    /// property that indicates the icon name to be shown if any icon was selected
+    var iconName: String?
+    var selectedIndexPath: IndexPath?
+
+    
     //MARK: - Views
+    
     let backgroundColorView: UIView = UIView()
     
     let mainView: UIView = {
@@ -29,33 +57,36 @@ class UserTextInputViewController: UIViewController {
         return stackView
     }()
 
+    lazy var collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        let itemWidthHeight = 40
+        
+        layout.itemSize = CGSize(width: itemWidthHeight, height: itemWidthHeight)
+        layout.minimumLineSpacing = 2
+        layout.minimumInteritemSpacing = 1
+        
+        let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = UIColor.white
+        
+        return collectionView
+    }()
+    
     let textFieldForInput = UITextField()
+    let iconTitleLabel = UILabel()
     let subViewForCollectionView = UIView()
     
-    var collectionView: UICollectionView?
+    //var collectionView: UICollectionView?
     let okButton = UIButton()
     let cancelButton = UIButton()
     
-    //MARK: - GLOBAL VARIABLES
-    var createListe: ((_ liste: Liste)->())?
-    let alertViewGrayColor = UIColor(red: 224.0/255.0, green: 224.0/255.0, blue: 224.0/255.0, alpha: 1)
-    /// property that indicates the icon name to be shown if any icon was selected
-    var iconName: String?
-
-    let iconNamesArray = ["todo-icon", "star-icon", "airplane-icon", "shopping-cart-icon", "home-icon", "clothes-icon", "gift-icon", "bag-icon", "light-bulb-icon", "sport-icon", "cooking-icon", "book-icon"]
     
-    let roseIconNamesArray = ["todo-icon-rose", "star-icon-rose", "airplane-icon-rose", "shopping-cart-icon-rose", "home-icon-rose", "clothes-icon-rose", "gift-icon-rose", "bag-icon-rose", "light-bulb-icon-rose", "sport-icon-rose", "cooking-icon-rose", "book-icon-rose"]
-    
-   
-    
-    var selectedIndexPath: IndexPath?
 
     //MARK: - Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        setupCollectionView()
+        //setupCollectionView()
         setupLayouts()
         textFieldForInput.becomeFirstResponder()
     
@@ -96,20 +127,34 @@ class UserTextInputViewController: UIViewController {
         
         //textField
         textFieldForInput.delegate = self
-        textFieldForInput.attributedPlaceholder = NSAttributedString(string: "name your new list...", attributes: [
-            .foregroundColor: colorize(hex: 0x8C8C8C),
-            .font: UIFont.systemFont(ofSize: 13.0, weight: .light),
+        textFieldForInput.attributedPlaceholder = NSAttributedString(string: textFieldPlaceHolderTextLitteral, attributes: [
+            .foregroundColor: textFieldPlaceholderTextColor,
+            .font: UIFont.systemFont(ofSize: textFieldFontSize, weight: .light),
             ])
-        textFieldForInput.setLeftPaddingPoints(10)
+       // textFieldForInput.adjustsFontForContentSizeCategory = true
+        textFieldForInput.setLeftPaddingPoints(textFieldLeftPadding)
         textFieldForInput.backgroundColor = .clear
-        textFieldForInput.layer.borderWidth = 0.5
-        textFieldForInput.layer.borderColor = colorize(hex: 0xC8C7CC).cgColor
-        textFieldForInput.font = UIFont.systemFont(ofSize: 13)
+        textFieldForInput.layer.borderWidth = textFieldBorderWidth
+        textFieldForInput.layer.borderColor = textFieldBorderColor.cgColor
+        textFieldForInput.font = UIFont.systemFont(ofSize: textFieldFontSize, weight: .light)
         textFieldForInput.returnKeyType = .done
 
-        //subViewForCollectionView
-        subViewForCollectionView.backgroundColor = .clear
-    
+//        //iconTitleLabel
+//        iconTitleLabel.text = iconTitleLabelName
+//        //iconTitleLabel.textAlignment = .center
+//        iconTitleLabel.backgroundColor = .clear
+//        iconTitleLabel.textColor = iconTitleLabelTextColor
+//        iconTitleLabel.font = UIFont.preferredFont(forTextStyle: .body)
+//        iconTitleLabel.adjustsFontForContentSizeCategory = true
+        
+//        //subViewForCollectionView
+//        subViewForCollectionView.backgroundColor = .clear
+//
+        // collectionView
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        
         //save button
         okButton.setTitle("OK", for: .normal)
         okButton.backgroundColor = UIColor.clear
@@ -124,60 +169,92 @@ class UserTextInputViewController: UIViewController {
         cancelButton.addTarget(self, action: #selector(cancelButtonAction), for: .touchUpInside)
 
 
-        [subViewForCollectionView, textFieldForInput, buttonStackView].forEach { mainView.addSubview($0) }
+        [textFieldForInput, buttonStackView, collectionView].forEach { mainView.addSubview($0) }
+        //mainView.addSubview()
     }
     
-    private func setupCollectionView() {
-        let layout = UICollectionViewFlowLayout()
-        let itemWidthHeight = 40
-
-        layout.itemSize = CGSize(width: itemWidthHeight, height: itemWidthHeight)
-        layout.minimumLineSpacing = 2
-        layout.minimumInteritemSpacing = 1
-
-        let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = UIColor.white
-
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
-        self.collectionView = collectionView
-        mainView.addSubview(collectionView)
-    }
     
     private func setupLayouts () {
- 
-        backgroundColorView.snp.makeConstraints { (make) in
-            make.left.top.right.bottom.equalToSuperview()
-        }
         
-        mainView.snp.makeConstraints { (make) in
-           // make.top.equalToSuperview().offset(self.view.bounds.height/2)
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview().offset(-100)
-            //make.size.equalTo(CGSize(width: 270, height: 200))
-        }
-        textFieldForInput.snp.makeConstraints { (make) in
-            make.centerX.equalToSuperview()
-            make.top.equalToSuperview().offset(16.0)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-            make.width.equalTo(238)
-            make.height.equalTo(24)
-        }
-        collectionView?.snp.makeConstraints({ [weak self]  (make) in
-            guard let `self` = self else { return }
-            make.top.equalTo(self.textFieldForInput.snp.bottom).offset(10)
-            make.left.equalToSuperview().offset(10.0)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(83)
-        })
-        buttonStackView.snp.makeConstraints { [weak self] (make) in
-            guard let `self` = self else { return }
-            make.left.bottom.right.equalToSuperview()
-            make.top.equalTo(self.collectionView!.snp.bottom).offset(10)
-            make.height.equalTo(44)
-        }
+        //backgroundColorView
+        backgroundColorView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+          backgroundColorView.topAnchor.constraint(equalTo: self.view.topAnchor),
+          backgroundColorView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+          backgroundColorView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+          backgroundColorView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+            ])
+        
+        //mainView
+        mainView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            mainView.heightAnchor.constraint(greaterThanOrEqualToConstant: 180),
+            mainView.widthAnchor.constraint(equalToConstant: 270),
+            mainView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            mainView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: -100)
+            ])
+        
+        //textFieldForInput
+        textFieldForInput.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            textFieldForInput.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 10),
+            textFieldForInput.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 16),
+            textFieldForInput.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -16)
+            ])
+        
+        //collectionView
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            collectionView.heightAnchor.constraint(equalToConstant: 83),
+            collectionView.topAnchor.constraint(equalTo: textFieldForInput.bottomAnchor, constant: 10),
+            collectionView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 10),
+            collectionView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -10)
+            
+            ])
+        //buttonStackView
+        buttonStackView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            buttonStackView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 10),
+            buttonStackView.bottomAnchor.constraint(equalTo: mainView.bottomAnchor),
+            buttonStackView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor),
+            buttonStackView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor)
+            ])
+        
+        
+        
+        
+        
+//        backgroundColorView.snp.makeConstraints { (make) in
+//            make.left.top.right.bottom.equalToSuperview()
+//        }
+//
+//        mainView.snp.makeConstraints { (make) in
+//           // make.top.equalToSuperview().offset(self.view.bounds.height/2)
+//            make.centerX.equalToSuperview()
+//            make.centerY.equalToSuperview().offset(-100)
+//            //make.size.equalTo(CGSize(width: 270, height: 200))
+//        }
+//        textFieldForInput.snp.makeConstraints { (make) in
+//            make.centerX.equalToSuperview()
+//            make.top.equalToSuperview().offset(16.0)
+//            make.left.equalToSuperview().offset(16)
+//            make.right.equalToSuperview().offset(-16)
+//            make.width.equalTo(238)
+//            make.height.equalTo(24)
+//        }
+//        collectionView?.snp.makeConstraints({ [weak self]  (make) in
+//            guard let `self` = self else { return }
+//            make.top.equalTo(self.textFieldForInput.snp.bottom).offset(10)
+//            make.left.equalToSuperview().offset(10.0)
+//            make.centerX.equalToSuperview()
+//            make.height.equalTo(83)
+//        })
+//        buttonStackView.snp.makeConstraints { [weak self] (make) in
+//            guard let `self` = self else { return }
+//            make.left.bottom.right.equalToSuperview()
+//            make.top.equalTo(self.collectionView!.snp.bottom).offset(10)
+//            make.height.equalTo(44)
+//        }
     }
 
     
@@ -191,7 +268,7 @@ class UserTextInputViewController: UIViewController {
 
     //MARK: - Button Actions
     @objc func oKButtonAction () {
-saveInput()
+        saveInput()
     }
     
     @objc func cancelButtonAction () {
@@ -289,7 +366,6 @@ extension UserTextInputViewController: UICollectionViewDelegate, UICollectionVie
     }
 
 }
-
 
 
 
