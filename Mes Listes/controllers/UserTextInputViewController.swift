@@ -13,9 +13,10 @@ class UserTextInputViewController: UIViewController {
     //MARK: Constants
     
     
-    let iconNamesArray = ["todo-icon", "star-icon", "airplane-icon", "shopping-cart-icon", "home-icon", "clothes-icon", "gift-icon", "bag-icon", "light-bulb-icon", "sport-icon", "cooking-icon", "book-icon"]
+    private let iconNamesArray = ["todo-icon", "star-icon", "airplane-icon", "shopping-cart-icon", "home-icon", "clothes-icon", "gift-icon", "bag-icon", "light-bulb-icon", "sport-icon", "cooking-icon", "book-icon"]
     
-    let roseIconNamesArray = ["todo-icon-rose", "star-icon-rose", "airplane-icon-rose", "shopping-cart-icon-rose", "home-icon-rose", "clothes-icon-rose", "gift-icon-rose", "bag-icon-rose", "light-bulb-icon-rose", "sport-icon-rose", "cooking-icon-rose", "book-icon-rose"]
+    private let roseIconNamesArray = ["todo-icon-rose", "star-icon-rose", "airplane-icon-rose", "shopping-cart-icon-rose", "home-icon-rose", "clothes-icon-rose", "gift-icon-rose", "bag-icon-rose", "light-bulb-icon-rose", "sport-icon-rose", "cooking-icon-rose", "book-icon-rose"]
+    private let standartIconName = "empty-big-circle"
     let alertViewGrayColor = UIColor(red: 224.0/255.0, green: 224.0/255.0, blue: 224.0/255.0, alpha: 1)
     
     let textFieldPlaceHolderTextLitteral = "name your new list..."
@@ -25,8 +26,8 @@ class UserTextInputViewController: UIViewController {
     let textFieldBorderColor = UIColor.init(red: 200/255, green: 199/255, blue: 204/255, alpha: 1)
     let textFieldFontSize: CGFloat = 18
     
-    let iconTitleLabelName = "Chose your own icon"
-    let iconTitleLabelTextColor = UIColor.init(red: 180/255, green: 206/255, blue: 215/255, alpha: 1)
+//    let iconTitleLabelName = "Chose your own icon"
+//    let iconTitleLabelTextColor = UIColor.init(red: 180/255, green: 206/255, blue: 215/255, alpha: 1)
     
     
     //MARK: - GLOBAL VARIABLES
@@ -35,7 +36,12 @@ class UserTextInputViewController: UIViewController {
     /// property that indicates the icon name to be shown if any icon was selected
     var iconName: String?
     var selectedIndexPath: IndexPath?
-
+    ///property that indicats if the list name is being changed (true) or created for the fist time (false)
+    var changingNameAndIcon = false
+    var listeToUpdate: Liste?
+//    var textFieldTextInput: String?
+//    var iconNameChosenByUser: String?
+    var changeName: ((_ liste: Liste, _ newName: String, _ newIconName: String )->())?
     
     //MARK: - Views
     
@@ -114,6 +120,7 @@ class UserTextInputViewController: UIViewController {
         super.viewWillLayoutSubviews()
         
     }
+
     
     private func setupViews () {
    
@@ -127,10 +134,14 @@ class UserTextInputViewController: UIViewController {
         
         //textField
         textFieldForInput.delegate = self
+        if changingNameAndIcon == true, let listeToUpdateUnwrapped = listeToUpdate {
+            textFieldForInput.text = listeToUpdateUnwrapped.name
+        }else{
         textFieldForInput.attributedPlaceholder = NSAttributedString(string: textFieldPlaceHolderTextLitteral, attributes: [
             .foregroundColor: textFieldPlaceholderTextColor,
             .font: UIFont.systemFont(ofSize: textFieldFontSize, weight: .light),
             ])
+        }
        // textFieldForInput.adjustsFontForContentSizeCategory = true
         textFieldForInput.setLeftPaddingPoints(textFieldLeftPadding)
         textFieldForInput.backgroundColor = .clear
@@ -284,13 +295,23 @@ class UserTextInputViewController: UIViewController {
     
     func saveInput () {
         
+
         if textFieldForInput.text != "" && textFieldForInput.text != nil {
+            if changingNameAndIcon, let listeToUpdateUnwrapped = listeToUpdate {
+                var temporaryIconName = standartIconName
+                if let iconNameLocal = iconName {
+                    temporaryIconName = iconNameLocal
+                }
+                let temporaryListName = textFieldForInput.text!
+                changeName!(listeToUpdateUnwrapped,temporaryListName, temporaryIconName)
+        }else{
             let newListe = Liste()
             newListe.name = textFieldForInput.text!
             if let iconNameLocal = iconName {
                 newListe.iconName = iconNameLocal
             }
             createListe!(newListe)
+        }
             
             UIView.animate(withDuration: 0.3, animations: { [weak self] in
                 guard let `self` = self else { return }
@@ -322,7 +343,7 @@ class UserTextInputViewController: UIViewController {
 //MARK: - TextFieldDelegate
 extension UserTextInputViewController: UITextFieldDelegate {
 
-   
+   //if the user presses enter (return)
         func textFieldShouldReturn(_ textField: UITextField) -> Bool {
             
             if textField == textFieldForInput {

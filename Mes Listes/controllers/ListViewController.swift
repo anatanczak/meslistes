@@ -25,6 +25,10 @@ class ListViewController: UIViewController {
     private let settingsAlertTitleNotification = "We need your permission"
     private let settingAlertMessageNotification = "Go to settings"
     
+    private let swipeCellBackgroundColorForDefault = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
+    private let swipeCellBackGroundColorForDestructive = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
+    
+    
     //MARK: - Properties
     let backgroundImageView: UIImageView = UIImageView()
     let tableView = UITableView()
@@ -211,7 +215,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 self.strikeOut(at: indexPath)
             }
             strikeOut.image = #imageLiteral(resourceName: "strikeout-icon")
-            strikeOut.backgroundColor = self.colorize(hex: 0xF0D6E2)
+            strikeOut.backgroundColor = self.swipeCellBackgroundColorForDefault
             
             //REMINDER
             let setReminder = SwipeAction(style: .default, title: nil) { action, indexPath in
@@ -220,7 +224,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 cell.hideSwipe(animated: true)
             }
             setReminder.image = UIImage(named: "reminder-icon")
-            setReminder.backgroundColor = self.colorize(hex: 0xF0D6E2)
+            setReminder.backgroundColor = self.swipeCellBackgroundColorForDefault
             
             //CALENDAR
             let addEventToCalendar = SwipeAction(style: .default, title: nil) { (action, indexPath) in
@@ -229,19 +233,26 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 cell.hideSwipe(animated: true)
             }
             addEventToCalendar.image = #imageLiteral(resourceName: "calendar-icon")
-            addEventToCalendar.backgroundColor = self.colorize(hex: 0xF0D6E2)
+            addEventToCalendar.backgroundColor = self.swipeCellBackgroundColorForDefault
             
             return[strikeOut, setReminder, addEventToCalendar]
             
         }else{
+            let changeTextAction = SwipeAction(style: .default, title: nil) { (action, indexpath) in
+                self.goToUserInputPopupAndChangeName(at: indexPath)
+                let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
+                cell.hideSwipe(animated: true)
+            }
+            changeTextAction.backgroundColor = self.swipeCellBackgroundColorForDefault
+            
             //DELETE
             let deleteAction = SwipeAction(style: .destructive, title: nil) { action, indexPath in
                 self.deleteListe(at: indexPath)
             }
             deleteAction.image = #imageLiteral(resourceName: "trash-icon")
-            deleteAction.backgroundColor = self.colorize(hex: 0xF25D61)
+            deleteAction.backgroundColor = self.swipeCellBackGroundColorForDestructive
             
-            return [deleteAction]
+            return [deleteAction, changeTextAction]
         }
         
     }
@@ -280,6 +291,21 @@ extension ListViewController: SwipeTableViewCellDelegate {
         }
     }
     
+    func goToUserInputPopupAndChangeName (at indexPath: IndexPath) {
+        
+        if let chosenListeToUpdate = lists?[indexPath.row] {
+           
+            let userTextInputVC = UserTextInputViewController()
+            userTextInputVC.changeName = changeName(_:_:_:)
+            userTextInputVC.changingNameAndIcon = true
+            userTextInputVC.listeToUpdate = chosenListeToUpdate
+            userTextInputVC.modalPresentationStyle = .overCurrentContext
+            
+            self.present(userTextInputVC, animated: true, completion: nil)
+        }
+        
+    }
+    
     func addEventToCalendar(at indexpath: IndexPath) {
         
         chosenNameforCalendar = lists![indexpath.row].name
@@ -309,6 +335,19 @@ extension ListViewController: SwipeTableViewCellDelegate {
     func createListe (_ liste: Liste) ->() {
 
         save(list: liste)
+        tableView.reloadData()
+    }
+    
+    ///changes the lsist's name and the icon
+    func changeName (_ liste: Liste, _ newName: String, _ newIconName: String ) ->() {
+        do {
+            try realm.write {
+                liste.name = newName
+                liste.iconName = newIconName
+            }
+        } catch {
+            print("Error saving massage\(error)")
+        }
         tableView.reloadData()
     }
 
