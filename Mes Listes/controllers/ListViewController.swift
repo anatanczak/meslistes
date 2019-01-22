@@ -277,16 +277,35 @@ extension ListViewController: SwipeTableViewCellDelegate {
     
 
     
+    
     //deletes the list
     func deleteListe (at indexpath: IndexPath) {
         if let listForDeletion = self.lists?[indexpath.row]{
-            print(listForDeletion.items)
+            let items : Results <Item> = listForDeletion.items.sorted(byKeyPath: "title", ascending: true)
             do {
                 try self.realm.write {
+                    for item in items {
+                        if item.hasImage {
+                            deleteImageFromDirectory(named: item.imageName)
+                        }
+                        self.realm.delete(item)
+                    }
                     self.realm.delete(listForDeletion)
                 }
             } catch{
                 print("Error deleting category\(error)")
+            }
+        }
+    }
+    
+    func deleteImageFromDirectory (named name: String) {
+        let imagePath = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent(name)
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: imagePath) {
+            do {
+                try fileManager.removeItem(atPath: imagePath)
+            } catch {
+                print(error)
             }
         }
     }
