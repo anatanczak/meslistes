@@ -26,9 +26,6 @@ class UserTextInputViewController: UIViewController {
     let textFieldBorderColor = UIColor.init(red: 200/255, green: 199/255, blue: 204/255, alpha: 1)
     let textFieldFontSize: CGFloat = 18
     
-//    let iconTitleLabelName = "Chose your own icon"
-//    let iconTitleLabelTextColor = UIColor.init(red: 180/255, green: 206/255, blue: 215/255, alpha: 1)
-    
     
     //MARK: - GLOBAL VARIABLES
     
@@ -39,8 +36,7 @@ class UserTextInputViewController: UIViewController {
     ///property that indicats if the list name is being changed (true) or created for the fist time (false)
     var changingNameAndIcon = false
     var listeToUpdate: Liste?
-//    var textFieldTextInput: String?
-//    var iconNameChosenByUser: String?
+
     var changeName: ((_ liste: Liste, _ newName: String, _ newIconName: String )->())?
     
     //MARK: - Views
@@ -92,7 +88,6 @@ class UserTextInputViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        //setupCollectionView()
         setupLayouts()
         textFieldForInput.becomeFirstResponder()
     
@@ -104,10 +99,7 @@ class UserTextInputViewController: UIViewController {
         
         UIView.animate(withDuration: 1) {
             self.backgroundColorView.alpha = 1.0
-            self.mainView.snp.updateConstraints({ (make) in
-            })
         }
-            self.view.layoutIfNeeded()
         }
 
     
@@ -150,17 +142,6 @@ class UserTextInputViewController: UIViewController {
         textFieldForInput.font = UIFont.systemFont(ofSize: textFieldFontSize, weight: .light)
         textFieldForInput.returnKeyType = .done
 
-//        //iconTitleLabel
-//        iconTitleLabel.text = iconTitleLabelName
-//        //iconTitleLabel.textAlignment = .center
-//        iconTitleLabel.backgroundColor = .clear
-//        iconTitleLabel.textColor = iconTitleLabelTextColor
-//        iconTitleLabel.font = UIFont.preferredFont(forTextStyle: .body)
-//        iconTitleLabel.adjustsFontForContentSizeCategory = true
-        
-//        //subViewForCollectionView
-//        subViewForCollectionView.backgroundColor = .clear
-//
         // collectionView
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -231,41 +212,6 @@ class UserTextInputViewController: UIViewController {
             buttonStackView.trailingAnchor.constraint(equalTo: mainView.trailingAnchor)
             ])
         
-        
-        
-        
-        
-//        backgroundColorView.snp.makeConstraints { (make) in
-//            make.left.top.right.bottom.equalToSuperview()
-//        }
-//
-//        mainView.snp.makeConstraints { (make) in
-//           // make.top.equalToSuperview().offset(self.view.bounds.height/2)
-//            make.centerX.equalToSuperview()
-//            make.centerY.equalToSuperview().offset(-100)
-//            //make.size.equalTo(CGSize(width: 270, height: 200))
-//        }
-//        textFieldForInput.snp.makeConstraints { (make) in
-//            make.centerX.equalToSuperview()
-//            make.top.equalToSuperview().offset(16.0)
-//            make.left.equalToSuperview().offset(16)
-//            make.right.equalToSuperview().offset(-16)
-//            make.width.equalTo(238)
-//            make.height.equalTo(24)
-//        }
-//        collectionView?.snp.makeConstraints({ [weak self]  (make) in
-//            guard let `self` = self else { return }
-//            make.top.equalTo(self.textFieldForInput.snp.bottom).offset(10)
-//            make.left.equalToSuperview().offset(10.0)
-//            make.centerX.equalToSuperview()
-//            make.height.equalTo(83)
-//        })
-//        buttonStackView.snp.makeConstraints { [weak self] (make) in
-//            guard let `self` = self else { return }
-//            make.left.bottom.right.equalToSuperview()
-//            make.top.equalTo(self.collectionView!.snp.bottom).offset(10)
-//            make.height.equalTo(44)
-//        }
     }
 
     

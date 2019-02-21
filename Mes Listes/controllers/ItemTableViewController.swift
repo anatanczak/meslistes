@@ -14,6 +14,7 @@ import SwipeCellKit
 import AVFoundation
 
 class ItemTableViewController: UIViewController {
+    
     //MARK: - Constants
     private let textFieldPlaceholderText = "Type your item here..."
     private let textFieldHeight: CGFloat = 40
@@ -21,6 +22,17 @@ class ItemTableViewController: UIViewController {
     private let subviewTextFiledPaddingRightLeft: CGFloat = 5
     private let distanceBetweenTextfieldAndTableView: CGFloat = 10
     private let borderSubView: CGFloat = 1
+    private let navigationBarTopInset: CGFloat = 0
+    private let navigationBarBottomInset: CGFloat = 0
+    private let navigationBarLeftInset: CGFloat = -4
+    private let navigationBarRightInset: CGFloat = 0
+    private let subviewForTextFieldAndPlusButtonCornerRadius: CGFloat = 10
+    private let subviewForTextFieldAndPlusButtonBorderWidth: CGFloat = 1
+    private let separatorInset: CGFloat = 0
+    private let estimatedRowHeight: CGFloat = 100
+    private let timeIntervalForCalendar: Double = 3600
+    private let swipeCellMinimumButtonWidth: CGFloat = 45.0
+    
     private let settingsAlertTitleCalendar = "The calendar permission was not authorized"
     private let settingsAlertMessageCalendar = "Please enable it in Settings to continue"
     private let settingsAlertTitleNotification = "Unable to use notifications"
@@ -30,7 +42,22 @@ class ItemTableViewController: UIViewController {
     private var chosenNameforCalendar = ""
     private var notificationTitle = ""
     private var notificationBody = ""
-    //private var rowForSelectedItem = 0
+    
+    private let leftNavigationBarButtonImage = #imageLiteral(resourceName: "back-button-icon")
+    private let plusBottonImage = #imageLiteral(resourceName: "plus-icon-gray")
+    private let backgroundImage = #imageLiteral(resourceName: "background-image")
+    private let strikeOutImage = #imageLiteral(resourceName: "strikeout-item-icon")
+    private let reminderImage = #imageLiteral(resourceName: "reminder-item-icon")
+    private let addEventToCalendarImage = #imageLiteral(resourceName: "calendar-item-icon")
+    private let deleteImage = #imageLiteral(resourceName: "delete-item-icon")
+    private let takePhotoImage = #imageLiteral(resourceName: "camera-icon")
+    
+    private let swipeCellBackgroundColorCustomPink = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
+    private let swipeCellBackgroundColorCustomRed = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
+    private let swipeCellBackgroundColorCustomGray = UIColor.init(red: 185/255, green: 205/255, blue: 214/255, alpha: 1)
+    
+    private let navigationBarAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 19, weight: .light), NSAttributedString.Key.foregroundColor: UIColor.black]
+    private let navigationBarAttributes2 = [NSAttributedString.Key.font: UIFont(name: "Zing Sans Rust Regular", size: 28.5)!, NSAttributedString.Key.foregroundColor: UIColor.black]
     
     //MARK: - Properties
     let realm = try! Realm()
@@ -43,7 +70,7 @@ class ItemTableViewController: UIViewController {
     var selectedRowToAddTheImage: Int?
     
     var isSwipeRightEnabled = true
-    let backgroundImage = #imageLiteral(resourceName: "background-image")
+    
 
     let eventStore = EKEventStore()
     
@@ -70,17 +97,21 @@ class ItemTableViewController: UIViewController {
     }
     
     @objc func keyboardWillShow(notification: Notification) {
+        if tableView.indexPathsForVisibleRows?.isEmpty == false {
         guard let keyboardFrame = (notification.userInfo?[UIResponder.keyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue else { return }
         let convertedFrame = view.convert(keyboardFrame, from: nil)
         tableView.contentInset.bottom = convertedFrame.height + 50
     }
+    }
 
     @objc func keyboardWillHide(notification: Notification) {
+        if tableView.indexPathsForVisibleRows?.isEmpty == false {
+            
         tableView.contentInset.bottom = 0
         tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
     }
-    
-    
+    }
+   
     override func viewDidLoad() {
          super.viewDidLoad()
         
@@ -92,6 +123,11 @@ class ItemTableViewController: UIViewController {
         imagePicker.delegate = self
         
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(true)
+        NotificationCenter.default.removeObserver(self)
+    }
 
 
     private func setupNavigationBar () {
@@ -99,30 +135,29 @@ class ItemTableViewController: UIViewController {
         let title = selectedListe?.name.uppercased() ?? "meslistes"
         self.title = title
         
-        let attributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 19, weight: .light), NSAttributedString.Key.foregroundColor: UIColor.black]
-        navigationController?.navigationBar.titleTextAttributes = attributes
+        navigationController?.navigationBar.titleTextAttributes = navigationBarAttributes
         
-        let leftNavigationButton = UIBarButtonItem(image: #imageLiteral(resourceName: "back-button-icon") , style: .plain, target: self, action: #selector(leftBarButtonAction))
+        let leftNavigationButton = UIBarButtonItem(image: leftNavigationBarButtonImage , style: .plain, target: self, action: #selector(leftBarButtonAction))
         leftNavigationButton.tintColor = .black
+        leftNavigationButton.imageInsets  = .init(top: navigationBarTopInset, left: navigationBarLeftInset, bottom: navigationBarBottomInset, right: navigationBarRightInset)
         
-        leftNavigationButton.imageInsets  = .init(top: 0, left: -4, bottom: 0, right: 0)
         self.navigationItem.setLeftBarButton(leftNavigationButton, animated: false)
 
     }
     
     private func setupViews () {
         
-        
         // backgroundImageView
         backgroundImageView.image = backgroundImage
         backgroundImageView.contentMode = .scaleAspectFill
+        
         view.addSubview(backgroundImageView)
         
         //subviewForTextField
         subviewForTextFieldAndPlusButton.backgroundColor = .clear
         subviewForTextFieldAndPlusButton.layer.borderColor = UIColor.white.cgColor
-        subviewForTextFieldAndPlusButton.layer.cornerRadius = 10
-        subviewForTextFieldAndPlusButton.layer.borderWidth = 1
+        subviewForTextFieldAndPlusButton.layer.cornerRadius = subviewForTextFieldAndPlusButtonCornerRadius
+        subviewForTextFieldAndPlusButton.layer.borderWidth = subviewForTextFieldAndPlusButtonBorderWidth
 
         view.addSubview(subviewForTextFieldAndPlusButton)
         
@@ -136,7 +171,7 @@ class ItemTableViewController: UIViewController {
         subviewForTextFieldAndPlusButton.addSubview(textFieldItems)
         
         //plusButton
-        plusButton.setImage(#imageLiteral(resourceName: "plus-icon-gray"), for: .normal)
+        plusButton.setImage(plusBottonImage, for: .normal)
         plusButton.addTarget(self, action: #selector(plusButtonAction), for: .touchUpInside)
         subviewForTextFieldAndPlusButton.addSubview(plusButton)
         
@@ -147,8 +182,8 @@ class ItemTableViewController: UIViewController {
         tableView.backgroundColor = UIColor.clear
         tableView.separatorColor = UIColor.white
         tableView.separatorStyle = .singleLine
-        tableView.separatorInset = .init(top: 0, left: 0, bottom: 0, right: 0)
-        tableView.estimatedRowHeight = 100
+        tableView.separatorInset = .init(top: separatorInset, left: separatorInset, bottom: separatorInset, right: separatorInset)
+        tableView.estimatedRowHeight = estimatedRowHeight
         tableView.rowHeight = UITableView.automaticDimension
         view.addSubview(tableView)
         
@@ -207,8 +242,8 @@ class ItemTableViewController: UIViewController {
     }
     
     @objc func leftBarButtonAction () {
-        let attributes = [NSAttributedString.Key.font: UIFont(name: "Zing Sans Rust Regular", size: 28.5)!, NSAttributedString.Key.foregroundColor: UIColor.black]
-        navigationController?.navigationBar.titleTextAttributes = attributes
+       
+        navigationController?.navigationBar.titleTextAttributes = navigationBarAttributes2
         _ = navigationController?.popToRootViewController(animated: true)
         
     }
@@ -219,6 +254,7 @@ class ItemTableViewController: UIViewController {
         userInputHandeled()
         tableView.reloadData()
     }
+    
     func userInputHandeled(){
         if textFieldItems.text != "" && textFieldItems.text != nil {
             
@@ -255,24 +291,20 @@ class ItemTableViewController: UIViewController {
     //MARK: - EVENTKIT AND CALENDAR METHODS
     
     func goToPopupAndSaveEvent () {
-        //popup
-        
+ 
         let dpVC = DatePickerPopupViewController()
         dpVC.modalPresentationStyle = .overCurrentContext
         dpVC.dateForCalendar = true
         dpVC.saveEventToCalendar = saveEventToCalendar
+        
         self.present(dpVC, animated: true, completion: nil)
-        
-        
     }
     func saveEventToCalendar(_ date: Date) ->(){
         
-        
         let event = EKEvent(eventStore: eventStore)
-        
         event.title = self.chosenNameforCalendar
         event.startDate = date
-        event.endDate = date.addingTimeInterval(3600)
+        event.endDate = date.addingTimeInterval(timeIntervalForCalendar)
         event.calendar = eventStore.defaultCalendarForNewEvents
         do  {
             try eventStore.save(event, span: .thisEvent)
@@ -341,8 +373,9 @@ class ItemTableViewController: UIViewController {
             
             switch settings.authorizationStatus {
             case .authorized:
+                DispatchQueue.main.async {
                 self!.goToPopupAndSetReminder()
-                
+                }
             case .denied:
                 self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
             case .notDetermined:
@@ -355,8 +388,6 @@ class ItemTableViewController: UIViewController {
         }
     }
     
-    
-    
     func goToPopupAndSetReminder () {
         let dpVC = DatePickerPopupViewController()
         dpVC.dateForCalendar = false
@@ -364,6 +395,7 @@ class ItemTableViewController: UIViewController {
         dpVC.setReminder = setReminder
         self.present(dpVC, animated: true, completion: nil)
     }
+    
     // sends the notification to user to remind the list
     func setReminder (_ components: DateComponents) ->(){
         
@@ -385,10 +417,6 @@ class ItemTableViewController: UIViewController {
 // MARK: - TABLE VIEW DELEGATE METHODS DATA SOURCE
 extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         return items?.count ?? 1
@@ -404,7 +432,7 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         cell.titleTextView.adjustsFontForContentSizeCategory = true
         cell.backgroundColor = UIColor.clear
         cell.indexpath = indexPath
-        
+        cell.selectionStyle = .none
         return cell
     }
     
@@ -441,12 +469,7 @@ extension ItemTableViewController: ItemCellProtocol {
         tableView.beginUpdates()
         tableView.endUpdates()
     }
-    
-
-    
-
-    
-    
+ 
 //    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell) {
 //        //let indexPath = tableView.indexPath(for: cell)
 //        DispatchQueue.main.sync {
@@ -472,40 +495,40 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             guard isSwipeRightEnabled else { return nil }
             
             //STRIKE OUT
-            let strikeOut = SwipeAction(style: .default, title: nil) { (action, indexPath) in
-                self.strikeOut(at: indexPath)
+            let strikeOut = SwipeAction(style: .default, title: nil) { [weak self] (action, indexPath) in
+                self?.strikeOut(at: indexPath)
                 tableView.reloadRows(at: [indexPath], with: .automatic)
             }
-            strikeOut.image = #imageLiteral(resourceName: "strikeout-item-icon")
-            strikeOut.backgroundColor = self.colorize(hex: 0xF0D6E2)
+            strikeOut.image = strikeOutImage
+            strikeOut.backgroundColor = swipeCellBackgroundColorCustomPink
             
              //REMINDER
-            let setReminder = SwipeAction(style: .default, title: nil) { action, indexPath in
-                self.updateModelByAddingAReminder(at: indexPath)
+            let setReminder = SwipeAction(style: .default, title: nil) {[weak self] (action, indexPath) in
+                self?.updateModelByAddingAReminder(at: indexPath)
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            setReminder.image = #imageLiteral(resourceName: "reminder-item-icon")
-            setReminder.backgroundColor = self.colorize(hex: 0xF0D6E2)
+            setReminder.image = reminderImage
+            setReminder.backgroundColor = swipeCellBackgroundColorCustomPink
             
              //CALENDAR
-            let addEventToCalendar = SwipeAction(style: .default, title: nil) { (action, indexPath) in
-                self.addEventToCalendar(at: indexPath)
+            let addEventToCalendar = SwipeAction(style: .default, title: nil) {[weak self] (action, indexPath) in
+                self?.addEventToCalendar(at: indexPath)
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            addEventToCalendar.image = #imageLiteral(resourceName: "calendar-item-icon")
-            addEventToCalendar.backgroundColor = self.colorize(hex: 0xF0D6E2)
+            addEventToCalendar.image = addEventToCalendarImage
+            addEventToCalendar.backgroundColor = swipeCellBackgroundColorCustomPink
             
             return[strikeOut, setReminder, addEventToCalendar]
             
         }else{
              //DELETE
-            let deleteAction = SwipeAction(style: .destructive, title: nil) { action, indexPath in
-                self.deleteItem(at: indexPath)
+            let deleteAction = SwipeAction(style: .destructive, title: nil) {[weak self] (action, indexPath) in
+                self?.deleteItem(at: indexPath)
             }
-            deleteAction.image = #imageLiteral(resourceName: "delete-item-icon")
-            deleteAction.backgroundColor = self.colorize(hex: 0xF25D61)
+            deleteAction.image = deleteImage
+            deleteAction.backgroundColor = swipeCellBackgroundColorCustomRed
             
             //take photo
             let takePhotoAction = SwipeAction(style: .default, title: nil) {[weak self] (action, indexpath) in
@@ -518,8 +541,8 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            takePhotoAction.backgroundColor = self.colorize(hex: 0xB9CDD6)
-            takePhotoAction.image = #imageLiteral(resourceName: "camera-icon")
+            takePhotoAction.backgroundColor = swipeCellBackgroundColorCustomGray
+            takePhotoAction.image = takePhotoImage
             return [deleteAction, takePhotoAction]
         }
         
@@ -532,7 +555,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         
         //diferent expansion styles
         options.expansionStyle = orientation == .left ? .selection : .destructive
-        options.minimumButtonWidth = 45.0
+        options.minimumButtonWidth = swipeCellMinimumButtonWidth
         return options
     }
     
@@ -554,19 +577,15 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     
     func updateModelByAddingAReminder(at indexpath: IndexPath) {
         
-//        rowForSelectedItem = indexpath.row
         notificationTitle = items![indexpath.row].title
-        
         getNotificationSettingStatus()
     }
     
 
     
     func addEventToCalendar(at indexpath: IndexPath) {
-        
-//        rowForSelectedItem = indexpath.row
+
         chosenNameforCalendar = items![indexpath.row].title
-        
         checkCalendarAuthorizationStatus()
     }
     
@@ -586,7 +605,6 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     
 }
 
-
 //MARK: - TextField Method
 
 extension ItemTableViewController: UITextFieldDelegate {
@@ -601,6 +619,7 @@ extension ItemTableViewController: UITextFieldDelegate {
 
 extension ItemTableViewController {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        print(scrollView)
         self.textFieldItems.resignFirstResponder()
         self.textFieldItems.text = ""
     }
@@ -631,17 +650,13 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
         self.present(alert, animated: true, completion: nil)
     }
     
-    func openCamera()
-    {
-        if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera))
-        {
+    func openCamera(){
+        if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera)){
             
             imagePicker.sourceType = UIImagePickerController.SourceType.camera
             imagePicker.allowsEditing = true
             self.present(imagePicker, animated: true, completion: nil)
-        }
-        else
-        {
+        }else{
             let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
@@ -767,7 +782,6 @@ extension ItemTableViewController
         }
         return nil
     }
-        
 }
     
 

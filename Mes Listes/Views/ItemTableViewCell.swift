@@ -14,8 +14,10 @@ protocol ItemCellProtocol: class
     func cellDidTapOnButton(at index: IndexPath)
     func updateTableView ()
     func changeItemTitleAndSaveItToRealm(at index: IndexPath,newTitle newImput: String)
-    
-   // func makeSelectedRowVisibleWhenEdited(at index: IndexPath,_ textView: UITextView)
+//    func cellDidBeginEditing(editingCell: ItemTableViewCell)
+//    func cellDidEndEditing(editingCell: ItemTableViewCell)
+//   
+    // func makeSelectedRowVisibleWhenEdited(at index: IndexPath,_ textView: UITextView)
     //    func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell)
     //    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell)
 }
@@ -233,8 +235,10 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-         if let indexPathUnwrapped = indexpath {
-        }
+//         if let indexPathUnwrapped = indexpath {
+//        }
+//        itemDelegate!.cellDidBeginEditing(editingCell: self)
+//        itemDelegate!.cellDidEndEditing(editingCell: self)
     }
     
     func textViewDidChange(_ textView: UITextView) {

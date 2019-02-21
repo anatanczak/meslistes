@@ -110,11 +110,14 @@ class ListeTableViewCell: SwipeTableViewCell {
        
         if let liste = model {
             //set icon
+            iconView.contentMode = .center
+            
             if let listeIconName = liste.iconName {
                 iconView.image = UIImage(named: listeIconName)
+                
             }else{
                 iconView.image = #imageLiteral(resourceName: "empty-big-circle")
-                iconView.contentMode = .center
+//                iconView.contentMode = .center
             }
             
             //set title

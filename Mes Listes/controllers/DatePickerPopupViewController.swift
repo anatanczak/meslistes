@@ -72,10 +72,7 @@ class DatePickerPopupViewController: UIViewController {
         
         UIView.animate(withDuration: 1) {
             self.backgroundColorView.alpha = 1.0
-            self.mainView.snp.updateConstraints({ (make) in
-            })
         }
-        self.view.layoutIfNeeded()
     }
     
     override func viewDidLayoutSubviews() {
@@ -191,7 +188,6 @@ class DatePickerPopupViewController: UIViewController {
             setReminder!(components)
         }
         dismiss(animated: true, completion: nil)
-        
     }
     
     @objc func cancelButtonAction () {
