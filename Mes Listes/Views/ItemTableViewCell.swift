@@ -14,6 +14,8 @@ protocol ItemCellProtocol: class
     func cellDidTapOnButton(at index: IndexPath)
     func updateTableView ()
     func changeItemTitleAndSaveItToRealm(at index: IndexPath,newTitle newImput: String)
+    //func updateTableViewByReloadingData ()
+   // func deleteEmptyItem(at index: IndexPath)
 //    func cellDidBeginEditing(editingCell: ItemTableViewCell)
 //    func cellDidEndEditing(editingCell: ItemTableViewCell)
 //   
@@ -32,6 +34,8 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     private let iconViewWidthHeight: CGFloat = 12
     private let upperTransparentBorder: CGFloat = 1
     private let photoButtonHeightWidth: CGFloat = 27
+    
+    private let titleForEmptyItem = "Empty Item"
     
     //MARK: - Properties
     weak var itemDelegate: ItemCellProtocol?
@@ -63,9 +67,10 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
-        // Configure the view for the selected state
+//        titleTextView.isEditable = true
+//        print("---> selected state")
     }
+    
     
     func setupCellView () {
         
@@ -87,6 +92,7 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
         titleTextView.adjustsFontForContentSizeCategory = true
         titleTextView.isScrollEnabled = false
+        //titleTextView.isEditable = false
         titleTextView.returnKeyType = UIReturnKeyType.done
         backgroundCellView.addSubview(titleTextView)
         
@@ -239,35 +245,41 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
 //        }
 //        itemDelegate!.cellDidBeginEditing(editingCell: self)
 //        itemDelegate!.cellDidEndEditing(editingCell: self)
+        
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        
         
         if let indexPathUnwrapped = indexpath {
             
             titleTextView.constraints.forEach {[weak self] (constraint) in
                 if constraint.firstAttribute == .height {
                     
-                    //!!!Need to change size here somehow
+                    //TODO: Need to change size here somehow
                     let size = CGSize(width: 60, height: CGFloat.infinity)
                     let estimatedSize = titleTextView.sizeThatFits(size)
                     constraint.constant = estimatedSize.height
                     
+                    
                     let textinput = titleTextView.text
                     
-                    self!.itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textinput!)
-                    self!.itemDelegate?.updateTableView()
-                    titleTextView.becomeFirstResponder()
-                    
+                        self!.itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textinput!)
+                        self!.itemDelegate?.updateTableView()
+                        titleTextView.becomeFirstResponder()
                 }
             }
         }
+
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if text == "\n"  // Recognizes enter key in keyboard
         {
+//            titleTextView.isEditable = false
             textView.resignFirstResponder()
             return false
         }

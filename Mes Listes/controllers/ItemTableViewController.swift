@@ -69,16 +69,18 @@ class ItemTableViewController: UIViewController {
     var nameOfTheSelectedListe = ""
     var selectedRowToAddTheImage: Int?
     
+    ///indexPath to deselect when scroll begins
+    var indexPathForCelectedCell: IndexPath?
     var isSwipeRightEnabled = true
     
 
     let eventStore = EKEventStore()
     
-    let backgroundImageView = UIImageView()
-    let subviewForTextFieldAndPlusButton = UIView()
-    let textFieldItems = UITextField()
-    let plusButton = UIButton()
-    let tableView = UITableView()
+    private let backgroundImageView = UIImageView()
+    private let subviewForTextFieldAndPlusButton = UIView()
+    private let textFieldItems = UITextField()
+    private let plusButton = UIButton()
+    private let tableView = UITableView()
     
     var selectedListe : Liste? {
         didSet {
@@ -242,7 +244,26 @@ class ItemTableViewController: UIViewController {
     }
     
     @objc func leftBarButtonAction () {
-       
+        //TODO: Delete all empty items
+        if let itemsArray = items {
+            for item in itemsArray {
+                if item.title == "" {
+                    if item.hasImage {
+                        deleteImageFromDirectory(named: item.imageName)
+                    }
+                    
+                    do {
+                        try self.realm.write {
+                            self.realm.delete(item)
+                        }
+                    }catch{
+                        print("Error deleting items with empty titlmes\(error)")
+                }
+                }
+            }
+        }
+
+        
         navigationController?.navigationBar.titleTextAttributes = navigationBarAttributes2
         _ = navigationController?.popToRootViewController(animated: true)
         
@@ -430,10 +451,20 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         cell.fillWith(model: items?[indexPath.row])
         cell.titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
         cell.titleTextView.adjustsFontForContentSizeCategory = true
+        //cell.titleTextView.isEditable = false
         cell.backgroundColor = UIColor.clear
         cell.indexpath = indexPath
         cell.selectionStyle = .none
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//       // let cell = tableView.visibleCells[indexPath.row]
+//        let cell = tableView.cellForRow(at: indexPath) as! ItemTableViewCell
+//        cell.titleTextView.isEditable = true
+//        print("---> selceted item")
+        indexPathForCelectedCell = indexPath
+        print("--->cell is selected at\(indexPath.row)")
     }
     
 }
@@ -469,6 +500,9 @@ extension ItemTableViewController: ItemCellProtocol {
         tableView.beginUpdates()
         tableView.endUpdates()
     }
+    
+
+    
  
 //    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell) {
 //        //let indexPath = tableView.indexPath(for: cell)
@@ -620,8 +654,13 @@ extension ItemTableViewController: UITextFieldDelegate {
 extension ItemTableViewController {
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         print(scrollView)
+        
         self.textFieldItems.resignFirstResponder()
         self.textFieldItems.text = ""
+        if let indexPath = indexPathForCelectedCell {
+        tableView.deselectRow(at: indexPath, animated: true)
+        }
+        //tableView.reloadData()
     }
 }
 
