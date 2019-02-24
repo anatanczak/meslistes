@@ -95,11 +95,11 @@ class ListViewController: UIViewController {
     
     //MARK: - Layout
     private func setupView () {
-        
+        self.view.layer.contents = backgroundImage.cgImage
         // backgroundImageView
-        backgroundImageView.image = backgroundImage
-        backgroundImageView.contentMode = .scaleAspectFill
-        view.addSubview(backgroundImageView)
+//        backgroundImageView.image = backgroundImage
+//        backgroundImageView.contentMode = .scaleAspectFill
+//        view.addSubview(backgroundImageView)
         
         //tableView
         tableView.delegate = self
@@ -115,7 +115,7 @@ class ListViewController: UIViewController {
     
     private func setupLayout() {
         
-        backgroundImageView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+        //backgroundImageView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
