@@ -245,23 +245,23 @@ class ItemTableViewController: UIViewController {
     
     @objc func leftBarButtonAction () {
         //TODO: Delete all empty items
-        if let itemsArray = items {
-            for item in itemsArray {
-                if item.title == "" {
-                    if item.hasImage {
-                        deleteImageFromDirectory(named: item.imageName)
-                    }
-                    
-                    do {
-                        try self.realm.write {
-                            self.realm.delete(item)
-                        }
-                    }catch{
-                        print("Error deleting items with empty titlmes\(error)")
-                }
-                }
-            }
-        }
+//        if let itemsArray = items {
+//            for item in itemsArray {
+//                if item.title == "" {
+//                    if item.hasImage {
+//                        deleteImageFromDirectory(named: item.imageName)
+//                    }
+//                    
+//                    do {
+//                        try self.realm.write {
+//                            self.realm.delete(item)
+//                        }
+//                    }catch{
+//                        print("Error deleting items with empty titlmes\(error)")
+//                }
+//                }
+//            }
+//        }
 
         
         navigationController?.navigationBar.titleTextAttributes = navigationBarAttributes2
@@ -453,19 +453,19 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         cell.titleTextView.adjustsFontForContentSizeCategory = true
         //cell.titleTextView.isEditable = false
         cell.backgroundColor = UIColor.clear
-        cell.indexpath = indexPath
+        //cell.indexpath = indexPath
         cell.selectionStyle = .none
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //       // let cell = tableView.visibleCells[indexPath.row]
 //        let cell = tableView.cellForRow(at: indexPath) as! ItemTableViewCell
 //        cell.titleTextView.isEditable = true
-//        print("---> selceted item")
-        indexPathForCelectedCell = indexPath
-        print("--->cell is selected at\(indexPath.row)")
-    }
+////        print("---> selceted item")
+//        indexPathForCelectedCell = indexPath
+//        print("--->cell is selected at\(indexPath.row)")
+//    }
     
 }
 
@@ -496,9 +496,18 @@ extension ItemTableViewController: ItemCellProtocol {
             }
     }
     
-    func updateTableView() {
+    func updateTableView(at indexPath: IndexPath) {
         tableView.beginUpdates()
         tableView.endUpdates()
+       
+    }
+    
+    func reloadCell (at indexPath: IndexPath) {
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+    }
+    
+    func getIdexPath (for cell: ItemTableViewCell) -> IndexPath? {
+        return tableView.indexPath(for: cell)
     }
     
 
@@ -507,15 +516,17 @@ extension ItemTableViewController: ItemCellProtocol {
 //    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell) {
 //        //let indexPath = tableView.indexPath(for: cell)
 //        DispatchQueue.main.sync {
-//            //cell.backgroundCellView.backgroundColor = .black
+//            cell.backgroundCellView.backgroundColor = .black
 //        }
-//        
+//    }
+//
 //        
 //    }
 //    func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell) {
 //        //let indexPath = tableView.indexPath(for: cell)
 //         DispatchQueue.main.sync {
-//        //cell.backgroundCellView.backgroundColor = .blue
+//        cell.backgroundCellView.backgroundColor = .blue
+//            cell.titleTextView.isEditable = true
 //        }
 //    }
 }
@@ -594,6 +605,9 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     }
     
     func deleteItem(at indexpath: IndexPath) {
+        
+
+        
         if let itemForDeletion = self.items?[indexpath.row] {
             if itemForDeletion.hasImage {
                 deleteImageFromDirectory(named: itemForDeletion.imageName)

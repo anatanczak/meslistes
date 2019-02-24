@@ -12,16 +12,18 @@ import SwipeCellKit
 protocol ItemCellProtocol: class
 {
     func cellDidTapOnButton(at index: IndexPath)
-    func updateTableView ()
+    func updateTableView (at indexPath: IndexPath)
     func changeItemTitleAndSaveItToRealm(at index: IndexPath,newTitle newImput: String)
+    func reloadCell (at indexPath: IndexPath)
+    func getIdexPath (for cell: ItemTableViewCell) -> IndexPath?
     //func updateTableViewByReloadingData ()
    // func deleteEmptyItem(at index: IndexPath)
 //    func cellDidBeginEditing(editingCell: ItemTableViewCell)
 //    func cellDidEndEditing(editingCell: ItemTableViewCell)
 //   
     // func makeSelectedRowVisibleWhenEdited(at index: IndexPath,_ textView: UITextView)
-    //    func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell)
-    //    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell)
+      //  func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell)
+     //   func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell)
 }
 
 class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
@@ -39,8 +41,11 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     
     //MARK: - Properties
     weak var itemDelegate: ItemCellProtocol?
-    var indexpath: IndexPath?
-    //private var tapCounter = 0
+    //var indexpath: IndexPath?
+    private var tapCounter = 0
+    private var textInputBeforeEditing = ""
+    var activeTextView: UITextView?
+    //weak var parentTableView = 
     
     //MARK: - Views
     var backgroundCellView = UIView()
@@ -55,9 +60,9 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         setupCellView()
         setupLayout()
         titleTextView.delegate = self
-        //
-        //        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
-        //        addGestureRecognizer(tap)
+        
+//                let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
+//                addGestureRecognizer(tap)
         
     }
     
@@ -69,6 +74,7 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         super.setSelected(selected, animated: animated)
 //        titleTextView.isEditable = true
 //        print("---> selected state")
+        //backgroundCellView.backgroundColor = .black
     }
     
     
@@ -92,14 +98,18 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
         titleTextView.adjustsFontForContentSizeCategory = true
         titleTextView.isScrollEnabled = false
+        //titleTextView.isSelectable = false
         //titleTextView.isEditable = false
         titleTextView.returnKeyType = UIReturnKeyType.done
+      
         backgroundCellView.addSubview(titleTextView)
         
         //photoButton
         photoButton.addTarget(self, action: #selector(photoButtonAction), for: .touchUpInside)
         backgroundCellView.addSubview(photoButton)
     }
+    
+
     
     func setupLayout () {
         // backgroundCellView
@@ -147,7 +157,7 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     //MARK: - DIFFERENT METHODS
     @objc func photoButtonAction ()
     {
-        if let indexPathUnwrapped = indexpath {
+        if let indexPathUnwrapped = itemDelegate?.getIdexPath(for: self) {
             itemDelegate?.cellDidTapOnButton(at: indexPathUnwrapped)
         }
     }
@@ -208,29 +218,30 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     
     
     
-    //       @objc func tapAction() {
-    //
-    //            if tapCounter == 0 {
-    //                DispatchQueue.global(qos: .background).async {
-    //                    usleep(250000)
-    //                    if self.tapCounter > 1 {
-    //                        self.doubleTapAction()
-    //                    } else {
-    //                        self.singleTapAction()
-    //                    }
-    //                    self.tapCounter = 0
-    //                }
-    //            }
-    //            tapCounter += 1
-    //        }
-    //
-    //        func singleTapAction() {
-    //            itemDelegate?.tableViewCell(singleTapActionDelegatedFrom: self)
-    //        }
-    //
-    //        func doubleTapAction() {
-    //            itemDelegate?.tableViewCell(doubleTapActionDelegatedFrom: self)
-    //        }
+//           @objc func tapAction() {
+//    
+//                if tapCounter == 0 {
+//                    DispatchQueue.global(qos: .background).async {
+//                        usleep(250000)
+//                        if self.tapCounter > 1 {
+//                            print("-->cell was tapped 2 fois")
+//                            //self.doubleTapAction()
+//                        } else {
+//                            self.singleTapAction()
+//                        }
+//                        self.tapCounter = 0
+//                    }
+//                }
+//                tapCounter += 1
+//            }
+//    
+//            func singleTapAction() {
+//                itemDelegate?.tableViewCell(singleTapActionDelegatedFrom: self)
+//            }
+    
+//            func doubleTapAction() {
+//                itemDelegate?.tableViewCell(doubleTapActionDelegatedFrom: self)
+//            }
     
     
     
@@ -241,31 +252,28 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
-//         if let indexPathUnwrapped = indexpath {
-//        }
-//        itemDelegate!.cellDidBeginEditing(editingCell: self)
-//        itemDelegate!.cellDidEndEditing(editingCell: self)
-        
+        textInputBeforeEditing = textView.text
+        activeTextView = textView
     }
     
     func textViewDidChange(_ textView: UITextView) {
         
-        if let indexPathUnwrapped = indexpath {
-            
+        if let indexPathUnwrapped = itemDelegate?.getIdexPath(for: self) {
+
             titleTextView.constraints.forEach {[weak self] (constraint) in
                 if constraint.firstAttribute == .height {
-                    
+
                     //TODO: Need to change size here somehow
                     let size = CGSize(width: 60, height: CGFloat.infinity)
                     let estimatedSize = titleTextView.sizeThatFits(size)
                     constraint.constant = estimatedSize.height
-                    
-                    
-                    let textinput = titleTextView.text
-                    
-                        self!.itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textinput!)
-                        self!.itemDelegate?.updateTableView()
-                        titleTextView.becomeFirstResponder()
+
+
+//
+//                    print("--->for item at \(indexPathUnwrapped) the text is \(textinput)")
+//
+                        self!.itemDelegate?.updateTableView(at: indexPathUnwrapped)
+//                        titleTextView.becomeFirstResponder()
                 }
             }
         }
@@ -273,13 +281,23 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
-
+        if let indexPathUnwrapped = itemDelegate?.getIdexPath(for: self) {
+             let textinput = titleTextView.text
+            if textinput == "" {
+                itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textInputBeforeEditing)
+                
+            }else{
+            itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textinput!)
+            }
+            itemDelegate?.reloadCell(at: indexPathUnwrapped)
+        }
+        activeTextView = nil
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if text == "\n"  // Recognizes enter key in keyboard
         {
-//            titleTextView.isEditable = false
+
             textView.resignFirstResponder()
             return false
         }
