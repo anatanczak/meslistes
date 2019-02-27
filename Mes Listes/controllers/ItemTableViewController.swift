@@ -72,7 +72,8 @@ class ItemTableViewController: UIViewController {
     ///indexPath to deselect when scroll begins
     var indexPathForCelectedCell: IndexPath?
     var isSwipeRightEnabled = true
-    
+    /// indexPath of the cell that has been swiped
+    var indexPathForSwipedCell: IndexPath?
 
     let eventStore = EKEventStore()
     
@@ -287,6 +288,7 @@ class ItemTableViewController: UIViewController {
                         let newItem = Item()
                         newItem.id = UUID().uuidString
                         newItem.title = textFieldItems.text!
+                        newItem.creationDate = Date()
                         currentListe.items.append(newItem)
                     }
                 }catch{
@@ -306,9 +308,11 @@ class ItemTableViewController: UIViewController {
     
     //retrieves data from the database
     func loadItems () {
-        items = selectedListe?.items.sorted(byKeyPath: "title", ascending: true)
+        items = selectedListe?.items.sorted(byKeyPath: "creationDate", ascending: true)
         tableView.reloadData()
     }
+    
+    //Different Methods
     
     //MARK: - EVENTKIT AND CALENDAR METHODS
     
@@ -459,6 +463,10 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
 //    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //       // let cell = tableView.visibleCells[indexPath.row]
 //        let cell = tableView.cellForRow(at: indexPath) as! ItemTableViewCell
@@ -504,7 +512,8 @@ extension ItemTableViewController: ItemCellProtocol {
     }
     
     func reloadCell (at indexPath: IndexPath) {
-        tableView.reloadRows(at: [indexPath], with: .automatic)
+        //tableView.reloadRows(at: [indexPath], with: .automatic)
+        tableView.reloadData()
     }
     
     func getIdexPath (for cell: ItemTableViewCell) -> IndexPath? {
@@ -537,6 +546,9 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
 
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
 
+        indexPathForSwipedCell = indexPath
+        self.textFieldItems.resignFirstResponder()
+        
         if orientation == .left {
             guard isSwipeRightEnabled else { return nil }
             
@@ -657,6 +669,20 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
 //MARK: - TextField Method
 
 extension ItemTableViewController: UITextFieldDelegate {
+    
+    func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+        if let indexPath = indexPathForSwipedCell {
+        let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
+        cell.hideSwipe(animated: true)
+            indexPathForSwipedCell = nil
+        }
+        return true
+    }
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        //self.tableView.setEditing(false, animated: true)
+    }
+    
+
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == textFieldItems {
         createItem()

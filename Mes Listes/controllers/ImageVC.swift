@@ -70,10 +70,10 @@ class ImageVC: UIViewController, UIGestureRecognizerDelegate {
         backgroundColorView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            backgroundColorView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            backgroundColorView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            backgroundColorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            backgroundColorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            backgroundColorView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            backgroundColorView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor),
+            backgroundColorView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            backgroundColorView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
             ])
         
         //mainView
