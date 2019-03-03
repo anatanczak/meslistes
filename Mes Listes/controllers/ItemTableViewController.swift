@@ -71,6 +71,10 @@ class ItemTableViewController: UIViewController {
     
     ///indexPath to deselect when scroll begins
     var indexPathForCelectedCell: IndexPath?
+    
+    ///indexPath to change itemTitle
+    var indexPathForItemToBEChanged: IndexPath?
+   
     var isSwipeRightEnabled = true
     /// indexPath of the cell that has been swiped
     var indexPathForSwipedCell: IndexPath?
@@ -242,7 +246,7 @@ class ItemTableViewController: UIViewController {
     
     //MARK: - ACTIONS
     @objc func plusButtonAction () {
-        createItem()
+        userInputHandeled()
     }
     
     @objc func leftBarButtonAction () {
@@ -274,28 +278,43 @@ class ItemTableViewController: UIViewController {
     //MARK: - Different Methods REALM
     
     func createItem (){
-        userInputHandeled()
-        tableView.reloadData()
+        if let currentListe = self.selectedListe {
+            
+            do {
+                try self.realm.write {
+                    let newItem = Item()
+                    newItem.id = UUID().uuidString
+                    newItem.title = textFieldItems.text!
+                    newItem.creationDate = Date()
+                    currentListe.items.append(newItem)
+                }
+            }catch{
+                print("Error saving item\(error)")
+            }
+        }
     }
     
     func userInputHandeled(){
+        
         if textFieldItems.text != "" && textFieldItems.text != nil {
-            
-            if let currentListe = self.selectedListe {
-                
-                do {
-                    try self.realm.write {
-                        let newItem = Item()
-                        newItem.id = UUID().uuidString
-                        newItem.title = textFieldItems.text!
-                        newItem.creationDate = Date()
-                        currentListe.items.append(newItem)
+            if  indexPathForItemToBEChanged != nil {
+                if let itemToBeEdited = self.items?[indexPathForItemToBEChanged!.row]{
+                    do {
+                        try self.realm.write {
+                            itemToBeEdited.title = textFieldItems.text!
+                        }
+                    }catch{
+                        print("Error saving item\(error)")
                     }
-                }catch{
-                    print("Error saving item\(error)")
+                   indexPathForItemToBEChanged =  nil
                 }
             }
+            else{
+                createItem()
+            }
+
             textFieldItems.text = ""
+            tableView.reloadData()
             
         }else if textFieldItems.text == "" && textFieldItems.text != nil{
             //TODO: - Textfield empty
@@ -456,9 +475,9 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         cell.fillWith(model: items?[indexPath.row])
         cell.titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
         cell.titleTextView.adjustsFontForContentSizeCategory = true
-        //cell.titleTextView.isEditable = false
+        cell.titleTextView.isEditable = false
         cell.backgroundColor = UIColor.clear
-        //cell.indexpath = indexPath
+       
         cell.selectionStyle = .none
         return cell
     }
@@ -467,14 +486,6 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         return true
     }
     
-//    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//       // let cell = tableView.visibleCells[indexPath.row]
-//        let cell = tableView.cellForRow(at: indexPath) as! ItemTableViewCell
-//        cell.titleTextView.isEditable = true
-////        print("---> selceted item")
-//        indexPathForCelectedCell = indexPath
-//        print("--->cell is selected at\(indexPath.row)")
-//    }
     
 }
 
@@ -493,28 +504,28 @@ extension ItemTableViewController: ItemCellProtocol {
         }
     }
     
-    func changeItemTitleAndSaveItToRealm(at index: IndexPath, newTitle newImput: String) {
-            if let currentItem = items?[index.row] {
-                do {
-                    try realm.write {
-                        currentItem.title = newImput
-                    }
-                } catch {
-                    print("error saving new title to realm\(error)")
-                }
-            }
-    }
+//    func changeItemTitleAndSaveItToRealm(at index: IndexPath, newTitle newImput: String) {
+//            if let currentItem = items?[index.row] {
+//                do {
+//                    try realm.write {
+//                        currentItem.title = newImput
+//                    }
+//                } catch {
+//                    print("error saving new title to realm\(error)")
+//                }
+//            }
+//    }
     
-    func updateTableView(at indexPath: IndexPath) {
-        tableView.beginUpdates()
-        tableView.endUpdates()
-       
-    }
+//    func updateTableView(at indexPath: IndexPath) {
+//        tableView.beginUpdates()
+//        tableView.endUpdates()
+//
+//    }
     
-    func reloadCell (at indexPath: IndexPath) {
-        //tableView.reloadRows(at: [indexPath], with: .automatic)
-        tableView.reloadData()
-    }
+//    func reloadCell (at indexPath: IndexPath) {
+//        //tableView.reloadRows(at: [indexPath], with: .automatic)
+//        tableView.reloadData()
+//    }
     
     func getIdexPath (for cell: ItemTableViewCell) -> IndexPath? {
         return tableView.indexPath(for: cell)
@@ -590,9 +601,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             
             //take photo
             let takePhotoAction = SwipeAction(style: .default, title: nil) {[weak self] (action, indexpath) in
-                //take photo action
-                print("photo has been taken")
-               
+              
                 self!.selectedRowToAddTheImage = indexPath.row
                 self!.takePhotoAndSaveIt()
                 
@@ -601,7 +610,17 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             }
             takePhotoAction.backgroundColor = swipeCellBackgroundColorCustomGray
             takePhotoAction.image = takePhotoImage
-            return [deleteAction, takePhotoAction]
+            
+            //edit title
+            let editTitleAction = SwipeAction(style: .default, title: nil) {[weak self] (action, indexpath) in
+                //TODO: change title to the item
+                self?.showTitleToChangeInTextField(at: indexPath)
+                let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
+                cell.hideSwipe(animated: true)
+            }
+            editTitleAction.backgroundColor = swipeCellBackgroundColorCustomGray
+            //TODO: add icon for the button to change title
+            return [deleteAction, takePhotoAction, editTitleAction]
         }
         
     }
@@ -664,6 +683,14 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         }
     }
     
+    func showTitleToChangeInTextField(at indexPath: IndexPath) {
+        if let currentItem = self.items?[indexPath.row] {
+            indexPathForItemToBEChanged = indexPath
+            textFieldItems.text = currentItem.title
+            textFieldItems.becomeFirstResponder()
+        }
+    }
+    
 }
 
 //MARK: - TextField Method
@@ -685,7 +712,7 @@ extension ItemTableViewController: UITextFieldDelegate {
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == textFieldItems {
-        createItem()
+        userInputHandeled()
         return true
         }
         return false
