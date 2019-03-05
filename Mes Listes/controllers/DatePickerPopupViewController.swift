@@ -183,11 +183,18 @@ class DatePickerPopupViewController: UIViewController {
     @objc func oKButtonAction(_ sender: UIButton) {
         if dateForCalendar == true {
             saveEventToCalendar!(datePicker.date)
+            
+            let  message = "Your event has been successfully added to calendar."
+           presentAlertConfirmation(with: message)
         }else{
             let components = datePicker.calendar.dateComponents([.day, .month, .year, .hour, .minute], from: datePicker.date)
             setReminder!(components)
+            
+             let  message = "The reminder has been successfully created."
+            presentAlertConfirmation(with: message)
         }
-        dismiss(animated: true, completion: nil)
+        
+        
     }
     
     @objc func cancelButtonAction () {
@@ -200,5 +207,17 @@ class DatePickerPopupViewController: UIViewController {
             self.dismiss(animated: true, completion: nil)
         }
         
+    }
+    
+    func presentAlertConfirmation (with alertMessage: String) {
+        
+        let alert = UIAlertController(title: nil, message: alertMessage, preferredStyle: .alert)
+        self.present(alert, animated: true, completion: nil)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            alert.dismiss(animated: true, completion: {[weak self] in
+                self!.dismiss(animated: true, completion: nil)
+            })
+        }
     }
 }

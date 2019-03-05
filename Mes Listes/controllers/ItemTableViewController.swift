@@ -356,6 +356,7 @@ class ItemTableViewController: UIViewController {
         }catch{
             print("error saving the event\(error)")
         }
+        
     }
     
     func checkCalendarAuthorizationStatus() {
