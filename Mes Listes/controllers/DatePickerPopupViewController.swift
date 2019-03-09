@@ -216,7 +216,10 @@ class DatePickerPopupViewController: UIViewController {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             alert.dismiss(animated: true, completion: {[weak self] in
-                self!.dismiss(animated: true, completion: nil)
+               
+                    self!.dismiss(animated: true, completion: nil)
+               
+                
             })
         }
     }

@@ -13,11 +13,11 @@ class ImageVC: UIViewController, UIGestureRecognizerDelegate {
     var imageName: String?
     
     let margins: CGFloat = 10
-//    let mainViewWidth: CGFloat = 300
-//    let mainViewHeight: CGFloat = 300
+
     
     //MARK: - Global Variables
     let backgroundColorView: UIView = UIView()
+    let helperFileManager = HelperFileManager()
     
     let mainImageView: UIImageView = {
         let view = UIImageView()
@@ -58,7 +58,7 @@ class ImageVC: UIViewController, UIGestureRecognizerDelegate {
         
         //mainview
         if let imageNameUnwrapped = imageName {
-            let newImage = getImage(imageName: imageNameUnwrapped)
+            let newImage = helperFileManager.getImage(imageName: imageNameUnwrapped)
             mainImageView.image = newImage
             //mainImageView.contentMode =
         }
@@ -89,23 +89,24 @@ class ImageVC: UIViewController, UIGestureRecognizerDelegate {
             ])
     }
     
-    func getImage(imageName : String)-> UIImage {
-        let fileManager = FileManager.default
-        // Here using getDirectoryPath method to get the Directory path
-        let imagePath = (self.getDirectoryPath() as NSString).appendingPathComponent(imageName)
-        if fileManager.fileExists(atPath: imagePath){
-            return UIImage(contentsOfFile: imagePath)!
-        }else{
-            print("No Image available")
-            return UIImage.init(named: "placeholder.png")! // Return placeholder image here
-        }
-    }
-    
-    func getDirectoryPath() -> String {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        let documentsDirectory = paths[0]
-        return documentsDirectory
-    }
+//    func getImage(imageName : String)-> UIImage {
+//        let fileManager = FileManager.default
+//        // Here using getDirectoryPath method to get the Directory path
+//        let imagePath = (self.getDirectoryPath() as NSString).appendingPathComponent(imageName)
+//        if fileManager.fileExists(atPath: imagePath){
+//            return UIImage(contentsOfFile: imagePath)!
+//        }else{
+//            print("No Image available")
+//            ///TODO: create placeholder image and place it here
+//            return UIImage.init(named: "placeholder.png")! // Return placeholder image here
+//        }
+//    }
+//
+//    func getDirectoryPath() -> String {
+//        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+//        let documentsDirectory = paths[0]
+//        return documentsDirectory
+//    }
     
     func swipeUpAndDown () {
         let swipe = UISwipeGestureRecognizer(target: self, action: #selector(swipeAction))

@@ -64,7 +64,7 @@ class ItemTableViewController: UIViewController {
     var items : Results <Item>?
     
     //get access to shared instance of the file manager
-    let fileManager = FileManager.default
+    let helperFileManager = HelperFileManager()
     
     var nameOfTheSelectedListe = ""
     var selectedRowToAddTheImage: Int?
@@ -419,7 +419,7 @@ class ItemTableViewController: UIViewController {
             
             switch settings.authorizationStatus {
             case .authorized:
-                DispatchQueue.main.async {
+                DispatchQueue.main.sync {
                 self!.goToPopupAndSetReminder()
                 }
             case .denied:
@@ -495,8 +495,7 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
 extension ItemTableViewController: ItemCellProtocol {
     
     func cellDidTapOnButton(at index: IndexPath) {
-    
-        print("buton tapped")
+
         if let currentItem = items?[index.row] {
             let imageVC = ImageVC()
             imageVC.imageName = currentItem.imageName
@@ -505,52 +504,16 @@ extension ItemTableViewController: ItemCellProtocol {
         }
     }
     
-//    func changeItemTitleAndSaveItToRealm(at index: IndexPath, newTitle newImput: String) {
-//            if let currentItem = items?[index.row] {
-//                do {
-//                    try realm.write {
-//                        currentItem.title = newImput
-//                    }
-//                } catch {
-//                    print("error saving new title to realm\(error)")
-//                }
-//            }
-//    }
-    
-//    func updateTableView(at indexPath: IndexPath) {
-//        tableView.beginUpdates()
-//        tableView.endUpdates()
-//
-//    }
-    
-//    func reloadCell (at indexPath: IndexPath) {
-//        //tableView.reloadRows(at: [indexPath], with: .automatic)
-//        tableView.reloadData()
-//    }
-    
+
     func getIdexPath (for cell: ItemTableViewCell) -> IndexPath? {
         return tableView.indexPath(for: cell)
     }
     
-
+    func getImageForButton (named imageName: String) -> UIImage {
+        let image = helperFileManager.getImage(imageName: imageName)
+        return image
+    }
     
- 
-//    func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell) {
-//        //let indexPath = tableView.indexPath(for: cell)
-//        DispatchQueue.main.sync {
-//            cell.backgroundCellView.backgroundColor = .black
-//        }
-//    }
-//
-//        
-//    }
-//    func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell) {
-//        //let indexPath = tableView.indexPath(for: cell)
-//         DispatchQueue.main.sync {
-//        cell.backgroundCellView.backgroundColor = .blue
-//            cell.titleTextView.isEditable = true
-//        }
-//    }
 }
 
     //MARK: - METHODS FOR SWIPE ACTIONS
@@ -643,7 +606,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
         
         if let itemForDeletion = self.items?[indexpath.row] {
             if itemForDeletion.hasImage {
-                deleteImageFromDirectory(named: itemForDeletion.imageName)
+                helperFileManager.deleteImageFromDirectory(named: itemForDeletion.imageName)
             }
             
             do {
@@ -694,7 +657,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     
 }
 
-//MARK: - TextField Method
+
 
 extension ItemTableViewController: UITextFieldDelegate {
     
@@ -754,28 +717,34 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
         }))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
+            present(alert, animated: true, completion: nil)
+
         
-        self.present(alert, animated: true, completion: nil)
     }
     
     func openCamera(){
-        if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera)){
-            
-            imagePicker.sourceType = UIImagePickerController.SourceType.camera
-            imagePicker.allowsEditing = true
-            self.present(imagePicker, animated: true, completion: nil)
-        }else{
-            let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }
+        
+            if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera)){
+                
+                imagePicker.sourceType = UIImagePickerController.SourceType.camera
+                imagePicker.allowsEditing = true
+                
+                present(imagePicker, animated: true, completion: nil)
+                
+            }else{
+                let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+                present(alert, animated: true, completion: nil)
+            }
+        
     }
     
     func openGallery()
     {
         imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
         imagePicker.allowsEditing = true
-        self.present(imagePicker, animated: true, completion: nil)
+        present(imagePicker, animated: true, completion: nil)
     }
     
     func checkForCameraAuthorizationStaturs ()
@@ -785,7 +754,10 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
         switch cameraAuthorizationStatus
         {
         case .notDetermined: requestCameraPermission()
-        case .authorized: openCamera()
+        case .authorized:
+           DispatchQueue.main.async {[weak self] in
+            self!.openCamera()
+            }
         case .restricted, .denied: goToSettingsAllert(alertTitle: settingAlertTitleCamera, alertMessage: settingAlertMessageCamera)
         }
     }
@@ -793,7 +765,7 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
     func requestCameraPermission() {
         AVCaptureDevice.requestAccess(for: .video, completionHandler: {[weak self] accessGranted in
             guard accessGranted == true else { return }
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async {[weak self] in
                 self!.openCamera()
             }
         })
@@ -806,11 +778,15 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
             print("No image found")
             return
         }
+        let itemID = getItemID()
+        //chose random name for the image
         
-        // print out the image size as a test
-        saveImageToDocumentDirectory(named: image)
-        tableView.reloadData()
+        if let itemIDString = itemID {
         
+        let nameForSavedImage = helperFileManager.saveImageToDocumentDirectory(named: image, for: itemIDString)
+            saveImageNameAsStringToRealm(nameForSavedImage)
+            tableView.reloadData()
+        }
     }
 }
 
@@ -818,48 +794,7 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
 
 extension ItemTableViewController
 {
-    func saveImageToDocumentDirectory (named image: UIImage)
-    {
 
-        //get the url for the users home directory
-        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
-        
-        //get the URL as a string
-        //let documetnPath = documentsURL.path
-        
-        let itemID = getItemID()
-        //chose random name for the image
-        
-        if let itemIDString = itemID {
-            
-            let nameForImage = "\(itemIDString).png"
-            
-            //create the variable that stores the name
-            let filePath = documentsURL.appendingPathComponent("\(nameForImage)")
-            
-            //save the name to realm
-            saveImageNameAsStringToRealm(nameForImage)
-            
-            //write data
-            do {
-                try UIImage.pngData(image)()!.write(to: filePath)
-            } catch {
-                print(error)
-            }
-        }
-    }
-    
-    func deleteImageFromDirectory (named name: String) {
-        let imagePath = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent(name)
-        if fileManager.fileExists(atPath: imagePath) {
-            do {
-                try fileManager.removeItem(atPath: imagePath)
-            } catch {
-                print(error)
-            }
-        }
-    }
-    
     func saveImageNameAsStringToRealm (_ imageName: String)
     {
         if let selectedRow = selectedRowToAddTheImage

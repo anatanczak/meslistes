@@ -21,6 +21,7 @@
 		4C250046212CA3ED004215D8 /* TextFieldPaddingEXT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C250045212CA3ED004215D8 /* TextFieldPaddingEXT.swift */; };
 		4C25004A2139C134004215D8 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2500492139C134004215D8 /* UIView.swift */; };
 		4C25004C213C7D24004215D8 /* UIButton + Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C25004B213C7D24004215D8 /* UIButton + Border.swift */; };
+		4C907F2A2233F30A008C0BC2 /* HelperFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C907F292233F30A008C0BC2 /* HelperFileManager.swift */; };
 		4CA5BE312126E9EA00EB6457 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE302126E9EA00EB6457 /* Coordinator.swift */; };
 		4CA5BE342126FB1100EB6457 /* ListeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */; };
 		4CA5BE3C2127772D00EB6457 /* Fontfabric.otf in Resources */ = {isa = PBXBuildFile; fileRef = 4CA5BE3B2127772D00EB6457 /* Fontfabric.otf */; };
@@ -48,6 +49,7 @@
 		4C250045212CA3ED004215D8 /* TextFieldPaddingEXT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPaddingEXT.swift; sourceTree = "<group>"; };
 		4C2500492139C134004215D8 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		4C25004B213C7D24004215D8 /* UIButton + Border.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton + Border.swift"; sourceTree = "<group>"; };
+		4C907F292233F30A008C0BC2 /* HelperFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperFileManager.swift; sourceTree = "<group>"; };
 		4CA5BE302126E9EA00EB6457 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeTableViewCell.swift; sourceTree = "<group>"; };
 		4CA5BE3B2127772D00EB6457 /* Fontfabric.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontfabric.otf; sourceTree = "<group>"; };
@@ -133,8 +135,18 @@
 				4C239A9820D51B37004A0089 /* Assets.xcassets */,
 				4CA5BE352127703E00EB6457 /* Fonts */,
 				4C239A9A20D51B37004A0089 /* LaunchScreen.storyboard */,
+				4C907F2B2233FC57008C0BC2 /* helpers */,
 			);
 			path = "supporting files";
+			sourceTree = "<group>";
+		};
+		4C907F2B2233FC57008C0BC2 /* helpers */ = {
+			isa = PBXGroup;
+			children = (
+				4C907F292233F30A008C0BC2 /* HelperFileManager.swift */,
+			);
+			name = helpers;
+			path = "New Group";
 			sourceTree = "<group>";
 		};
 		4CA5BE322126FABB00EB6457 /* Views */ = {
@@ -331,6 +343,7 @@
 				4C239AA820D51B73004A0089 /* ListViewController.swift in Sources */,
 				4C239AA620D51B73004A0089 /* Liste.swift in Sources */,
 				4CA5BE43212AFE1700EB6457 /* ViewController.swift in Sources */,
+				4C907F2A2233F30A008C0BC2 /* HelperFileManager.swift in Sources */,
 				4CA5BE342126FB1100EB6457 /* ListeTableViewCell.swift in Sources */,
 				63F0143F2145048A00465256 /* UIScrollView+Extension.swift in Sources */,
 				4C25004A2139C134004215D8 /* UIView.swift in Sources */,

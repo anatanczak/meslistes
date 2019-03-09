@@ -135,6 +135,7 @@ class UserTextInputViewController: UIViewController {
             ])
         }
        // textFieldForInput.adjustsFontForContentSizeCategory = true
+        //TODO: Find out why this padding causes leaks and what it serves
         textFieldForInput.setLeftPaddingPoints(textFieldLeftPadding)
         textFieldForInput.backgroundColor = .clear
         textFieldForInput.layer.borderWidth = textFieldBorderWidth

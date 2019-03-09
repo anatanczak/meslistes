@@ -464,7 +464,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             
             switch settings.authorizationStatus {
             case .authorized:
-                DispatchQueue.main.async {
+                DispatchQueue.main.sync {
                     // UI work here
                     self!.goToPopupAndSetReminder()
                 }  

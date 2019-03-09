@@ -12,18 +12,8 @@ import SwipeCellKit
 protocol ItemCellProtocol: class
 {
     func cellDidTapOnButton(at index: IndexPath)
-   // func updateTableView (at indexPath: IndexPath)
-   // func changeItemTitleAndSaveItToRealm(at index: IndexPath,newTitle newImput: String)
-   // func reloadCell (at indexPath: IndexPath)
     func getIdexPath (for cell: ItemTableViewCell) -> IndexPath?
-    //func updateTableViewByReloadingData ()
-   // func deleteEmptyItem(at index: IndexPath)
-//    func cellDidBeginEditing(editingCell: ItemTableViewCell)
-//    func cellDidEndEditing(editingCell: ItemTableViewCell)
-//   
-    // func makeSelectedRowVisibleWhenEdited(at index: IndexPath,_ textView: UITextView)
-      //  func tableViewCell(singleTapActionDelegatedFrom cell: ItemTableViewCell)
-     //   func tableViewCell(doubleTapActionDelegatedFrom cell: ItemTableViewCell)
+    func getImageForButton (named imageName: String) -> UIImage
 }
 
 class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
@@ -36,17 +26,10 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
     private let iconViewWidthHeight: CGFloat = 12
     private let upperTransparentBorder: CGFloat = 1
     private let photoButtonHeightWidth: CGFloat = 27
-    
-    //private let titleForEmptyItem = "Empty Item"
-    
+
     //MARK: - Properties
     weak var itemDelegate: ItemCellProtocol?
-    //var indexpath: IndexPath?
-    //private var tapCounter = 0
-    //private var textInputBeforeEditing = ""
-    //var activeTextView: UITextView?
-    //weak var parentTableView = 
-    
+
     //MARK: - Views
     var backgroundCellView = UIView()
     let iconView = UIImageView()
@@ -92,8 +75,6 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
         titleTextView.adjustsFontForContentSizeCategory = true
         titleTextView.isScrollEnabled = false
-        //titleTextView.isSelectable = false
-        //titleTextView.isEditable = false
         titleTextView.returnKeyType = UIReturnKeyType.done
       
         backgroundCellView.addSubview(titleTextView)
@@ -178,7 +159,8 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
             {
                 photoButton.isHidden = false
                 //retireve the image and add it as the background
-                let image = getImage(imageName: item.imageName)
+                let image = itemDelegate!.getImageForButton(named: item.imageName)
+                    //getImage(imageName: item.imageName)
                 photoButton.setImage(image, for: .normal)
             }
             else
@@ -188,86 +170,11 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         }else{
             titleTextView.text = "You haven't created an item yet"
         }
-        
-        
     }
-    
-    func getImage(imageName : String)-> UIImage {
-        let fileManager = FileManager.default
-        // Here using getDirectoryPath method to get the Directory path
-        let imagePath = (self.getDirectoryPath() as NSString).appendingPathComponent(imageName)
-        if fileManager.fileExists(atPath: imagePath){
-            return UIImage(contentsOfFile: imagePath)!
-        }else{
-            print("No Image available")
-            return UIImage.init(named: "placeholder.png")! // Return placeholder image here
-        }
-    }
-    
-    func getDirectoryPath() -> String {
-        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        let documentsDirectory = paths[0]
-        return documentsDirectory
-    }
-    
-    
     override func prepareForReuse() {
         titleTextView.text = nil
         iconView.image = nil
         photoButton.setBackgroundImage(nil, for: .normal)
     }
-    
-//    func textViewDidBeginEditing(_ textView: UITextView) {
-//        textInputBeforeEditing = textView.text
-//        activeTextView = textView
-//    }
-    
-//    func textViewDidChange(_ textView: UITextView) {
-//
-//        if let indexPathUnwrapped = itemDelegate?.getIdexPath(for: self) {
-//
-//            titleTextView.constraints.forEach {[weak self] (constraint) in
-//                if constraint.firstAttribute == .height {
-//
-//                    //TODO: Need to change size here somehow
-//                    let size = CGSize(width: 60, height: CGFloat.infinity)
-//                    let estimatedSize = titleTextView.sizeThatFits(size)
-//                    constraint.constant = estimatedSize.height
-//
-//
-////
-////                    print("--->for item at \(indexPathUnwrapped) the text is \(textinput)")
-////
-//                        self!.itemDelegate?.updateTableView(at: indexPathUnwrapped)
-////                        titleTextView.becomeFirstResponder()
-//                }
-//            }
-//        }
-//
-//    }
-    
-//    func textViewDidEndEditing(_ textView: UITextView) {
-//        if let indexPathUnwrapped = itemDelegate?.getIdexPath(for: self) {
-//             let textinput = titleTextView.text
-//            if textinput == "" {
-//                itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textInputBeforeEditing)
-//
-//            }else{
-//            itemDelegate?.changeItemTitleAndSaveItToRealm(at: indexPathUnwrapped, newTitle: textinput!)
-//            }
-//            itemDelegate?.reloadCell(at: indexPathUnwrapped)
-//        }
-//        activeTextView = nil
-//    }
-    
-//    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-//        if text == "\n"  // Recognizes enter key in keyboard
-//        {
-//
-//            textView.resignFirstResponder()
-//            return false
-//        }
-//        return true
-//    }
 }
 
