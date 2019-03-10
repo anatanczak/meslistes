@@ -10,28 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Mes Listes/controllers/ItemTableViewController.swift"
-            timestampString = "573832454.324008"
+            timestampString = "573920342.709734"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "774"
-            endingLineNumber = "774"
-            landmarkName = "imagePickerController(_:didFinishPickingMediaWithInfo:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Mes Listes/controllers/UserTextInputViewController.swift"
-            timestampString = "573832454.324079"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "139"
-            endingLineNumber = "139"
-            landmarkName = "setupViews()"
+            startingLineNumber = "771"
+            endingLineNumber = "771"
+            landmarkName = "requestCameraPermission()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -42,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Mes Listes/controllers/ItemTableViewController.swift"
-            timestampString = "573832454.324127"
+            timestampString = "573920342.7098041"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "747"
-            endingLineNumber = "747"
-            landmarkName = "openGallery()"
+            startingLineNumber = "742"
+            endingLineNumber = "742"
+            landmarkName = "openCamera()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

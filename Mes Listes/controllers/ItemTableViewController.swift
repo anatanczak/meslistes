@@ -408,8 +408,10 @@ class ItemTableViewController: UIViewController {
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(cancelAction)
-        
-        present(alert, animated: true, completion: nil)
+       
+        DispatchQueue.main.sync { [weak self] in
+        self?.present(alert, animated: true, completion: nil)
+        }
     }
     //MARK: - NOTIFICATION CENTER MATHODS (REMINDERS)
     

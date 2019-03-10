@@ -245,7 +245,11 @@ class UserTextInputViewController: UIViewController {
 
         if textFieldForInput.text != "" && textFieldForInput.text != nil {
             if changingNameAndIcon, let listeToUpdateUnwrapped = listeToUpdate {
+                
                 var temporaryIconName = standartIconName
+                if let iconNameLocal = listeToUpdateUnwrapped.iconName {
+                    temporaryIconName = iconNameLocal
+                }
                 if let iconNameLocal = iconName {
                     temporaryIconName = iconNameLocal
                 }
