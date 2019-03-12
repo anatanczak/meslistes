@@ -12,6 +12,7 @@ import UserNotifications
 import EventKit
 import SwipeCellKit
 import SnapKit
+import StoreKit
 
 class ListViewController: UIViewController {
     
@@ -65,13 +66,11 @@ class ListViewController: UIViewController {
         setupView()
         setupLayout()
         
-        if isAppAlreadyLaunchedOnce() {
-            loadLists()
-        }else{
-            threeHardCodedExamples()
-            loadLists()
-        }
+countAppLaunchesSwitchOnThem()
+        
+        
     }
+
 
     
     private func setupNavigationBar () {
@@ -326,6 +325,35 @@ extension ListViewController: SwipeTableViewCellDelegate {
     }
     
     //MARK: - DIFFERENT METHODS
+    func countAppLaunchesSwitchOnThem () {
+        let currentCount = appLaunchCount()
+        
+        switch currentCount {
+        case 1:
+            threeHardCodedExamples()
+            loadLists()
+        case 10, 50, 100:
+            loadLists()
+            promtForReview()
+        default:
+            loadLists()
+        }
+    }
+    
+    func appLaunchCount() -> Int {
+        var currentCount = UserDefaults.standard.integer(forKey: "launchCount")
+        currentCount += 1
+        UserDefaults.standard.set(currentCount, forKey: "launchCount")
+        return currentCount
+    }
+    
+    func promtForReview() {
+        if #available(iOS 10.3, *) {
+            SKStoreReviewController.requestReview()
+        }
+    }
+    
+    //MARK: REALM METHODS
     
     ///creates a liste and saves it in Realm
     func createListe (_ liste: Liste) ->() {
@@ -364,17 +392,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         
     }
     
-    //Checks if the app is being launched for the first time
-    func isAppAlreadyLaunchedOnce()->Bool{
-        let defaults = UserDefaults.standard
-        
-        if defaults.string(forKey: "isAppAlreadyLaunchedOnce") != nil{
-            return true
-        }else{
-            defaults.set(true, forKey: "isAppAlreadyLaunchedOnce")
-            return false
-        }
-    }
+
     
     //MARK: - EVENTKIT AND CALENDAR METHODS
     
