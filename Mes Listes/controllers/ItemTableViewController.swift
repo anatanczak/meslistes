@@ -792,7 +792,7 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
     }
 }
 
-//MARK: - File Manager and Saving Photo functions
+//MARK: - Saving Photo functions realm
 
 extension ItemTableViewController
 {

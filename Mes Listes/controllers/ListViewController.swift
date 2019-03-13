@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import RealmSwift
+//import RealmSwift
 import UserNotifications
 import EventKit
 import SwipeCellKit
@@ -47,10 +47,12 @@ class ListViewController: UIViewController {
     let backgroundImageView: UIImageView = UIImageView()
     let tableView = UITableView()
     
+    let helperRealmManager = HelperRealmManager()
     
-    let realm = try! Realm()
-    var lists : Results <Liste>?
-    //var chosenRow = 0
+    //    let realm = try! Realm()
+    // var lists : Results <Liste>?
+    
+    
     var chosenNameforCalendar = ""
     var notificationTitleForReminder = ""
     var isSwipeRightEnabled = true
@@ -61,17 +63,17 @@ class ListViewController: UIViewController {
     //MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        
         setupNavigationBar()
         setupView()
         setupLayout()
         
-countAppLaunchesSwitchOnThem()
+        countAppLaunchesSwitchOnThem()
         
         
     }
-
-
+    
+    
     
     private func setupNavigationBar () {
         
@@ -95,11 +97,7 @@ countAppLaunchesSwitchOnThem()
     //MARK: - Layout
     private func setupView () {
         self.view.layer.contents = backgroundImage.cgImage
-        // backgroundImageView
-//        backgroundImageView.image = backgroundImage
-//        backgroundImageView.contentMode = .scaleAspectFill
-//        view.addSubview(backgroundImageView)
-        
+
         //tableView
         tableView.delegate = self
         tableView.dataSource = self
@@ -114,8 +112,7 @@ countAppLaunchesSwitchOnThem()
     
     private func setupLayout() {
         
-        //backgroundImageView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
-        
+    
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -124,27 +121,6 @@ countAppLaunchesSwitchOnThem()
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
             ])
     }
-    
-    
-    //MARK: - REALM FUNCTIONS
-    
-    //saves data into database
-    func save(list: Liste) {
-        do {
-            try realm.write {
-                realm.add(list)
-            }
-        } catch {
-            print("Error saving massage\(error)")
-        }
-    }
-    
-    //retrieves data from the database
-    func loadLists () {
-        lists = realm.objects(Liste.self)
-        lists = lists?.sorted(byKeyPath: "name", ascending: true)
-        tableView.reloadData()
-    }
 }
 
 //MARK: - TableView DataSource and Delegate
@@ -152,16 +128,11 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
     
     // delegate methods
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
+        guard let lists = helperRealmManager.lists else { return }
         
         let itemVC = ItemTableViewController()
-        
-        if let selectedListWithValue = lists?[indexPath.row] {
-            itemVC.selectedListe = selectedListWithValue
-        }
-        
+        itemVC.selectedListe = lists[indexPath.row]
         self.show(itemVC, sender: self)
-        
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -170,14 +141,14 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
     
     // data source methhods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return lists?.count ?? 1
+        return helperRealmManager.lists?.count ?? 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! ListeTableViewCell
         cell.delegate = self
-        cell.fillWith(model: lists?[indexPath.row])
+        cell.fillWith(model: helperRealmManager.lists?[indexPath.row])
         cell.titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
         cell.titleLabel.adjustsFontForContentSizeCategory = true
         cell.selectionStyle = .none
@@ -245,8 +216,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
     func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeTableOptions {
         
         var options = SwipeTableOptions()
-        
-        
+      
         //diferent expansion styles
         options.expansionStyle = orientation == .left ? .selection : .destructive
         options.minimumButtonWidth = minimumSwipeCellWidth
@@ -254,45 +224,18 @@ extension ListViewController: SwipeTableViewCellDelegate {
     }
     
     func addReminder(at indexpath: IndexPath) {
-        notificationTitle = lists![indexpath.row].name
+        notificationTitle = helperRealmManager.lists![indexpath.row].name
         getNotificationSettingStatus()
     }
     
     //deletes the list
     func deleteListe (at indexpath: IndexPath) {
-        if let listForDeletion = self.lists?[indexpath.row]{
-            let items : Results <Item> = listForDeletion.items.sorted(byKeyPath: "title", ascending: true)
-            do {
-                try self.realm.write {
-                    for item in items {
-                        if item.hasImage {
-                            deleteImageFromDirectory(named: item.imageName)
-                        }
-                        self.realm.delete(item)
-                    }
-                    self.realm.delete(listForDeletion)
-                }
-            } catch{
-                print("Error deleting category\(error)")
-            }
-        }
-    }
-    
-    func deleteImageFromDirectory (named name: String) {
-        let imagePath = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as NSString).appendingPathComponent(name)
-        let fileManager = FileManager.default
-        if fileManager.fileExists(atPath: imagePath) {
-            do {
-                try fileManager.removeItem(atPath: imagePath)
-            } catch {
-                print(error)
-            }
-        }
+        helperRealmManager.deleteListAndItsItems(atRow: indexpath.row)
     }
     
     func goToUserInputPopupAndChangeName (at indexPath: IndexPath) {
         
-        if let chosenListeToUpdate = lists?[indexPath.row] {
+        if let chosenListeToUpdate = helperRealmManager.lists?[indexPath.row] {
             
             let userTextInputVC = UserTextInputViewController()
             userTextInputVC.changeName = changeName(_:_:_:)
@@ -306,22 +249,14 @@ extension ListViewController: SwipeTableViewCellDelegate {
     }
     
     func addEventToCalendar(at indexpath: IndexPath) {
-        chosenNameforCalendar = lists![indexpath.row].name
+        chosenNameforCalendar = helperRealmManager.lists![indexpath.row].name
         checkCalendarAuthorizationStatus()
     }
     
     //strikes out the text
     func strikeOut(at indexPath: IndexPath) {
-        if let itemForUpdate = self.lists?[indexPath.row] {
-            do {
-                try realm.write {
-                    itemForUpdate.done = !itemForUpdate.done
-                }
-            }catch{
-                print("error updating relm\(error)")
-            }
-            tableView.reloadData()
-        }
+        helperRealmManager.updateIsDone(forListAtRow: indexPath.row)
+        tableView.reloadData()
     }
     
     //MARK: - DIFFERENT METHODS
@@ -331,12 +266,15 @@ extension ListViewController: SwipeTableViewCellDelegate {
         switch currentCount {
         case 1:
             threeHardCodedExamples()
-            loadLists()
+            helperRealmManager.loadLists()
+            tableView.reloadData()
         case 10, 50, 100:
-            loadLists()
             promtForReview()
+            helperRealmManager.loadLists()
+            tableView.reloadData()
         default:
-            loadLists()
+            helperRealmManager.loadLists()
+            tableView.reloadData()
         }
     }
     
@@ -353,46 +291,37 @@ extension ListViewController: SwipeTableViewCellDelegate {
         }
     }
     
-    //MARK: REALM METHODS
-    
     ///creates a liste and saves it in Realm
     func createListe (_ liste: Liste) ->() {
-        save(list: liste)
+        helperRealmManager.save(list: liste)
         tableView.reloadData()
     }
     
     ///changes the list's name and the icon
     func changeName (_ liste: Liste, _ newName: String, _ newIconName: String ) ->() {
-        do {
-            try realm.write {
-                liste.name = newName
-                liste.iconName = newIconName
-            }
-        } catch {
-            print("Error saving massage\(error)")
-        }
+        helperRealmManager.changeListName(liste, newName, newIconName)
         tableView.reloadData()
     }
     
     func threeHardCodedExamples () {
-        let fisrtListe = Liste()
-        fisrtListe.name = "Shopping list"
-        fisrtListe.iconName = "shopping-cart-icon"
-        save(list: fisrtListe)
+        let firstListe = Liste()
+        firstListe.name = "Shopping list"
+        firstListe.iconName = "shopping-cart-icon"
+        helperRealmManager.save(list: firstListe)
         
         let secondListe = Liste()
         secondListe.name = "To do"
         secondListe.iconName = "todo-icon"
-        save(list: secondListe)
+        helperRealmManager.save(list: secondListe)
         
         let thirdListe = Liste()
         thirdListe.name = "Travelpack"
         thirdListe.iconName = "airplane-icon"
-        save(list: thirdListe)
+        helperRealmManager.save(list: thirdListe)
         
     }
     
-
+    
     
     //MARK: - EVENTKIT AND CALENDAR METHODS
     
@@ -408,8 +337,6 @@ extension ListViewController: SwipeTableViewCellDelegate {
         
     }
     func saveEventToCalendar(_ date: Date) ->(){
-        
-        
         let event = EKEvent(eventStore: eventStore)
         
         event.title = self.chosenNameforCalendar
@@ -424,7 +351,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
     }
     
     func checkCalendarAuthorizationStatus() {
-       
+        
         let status = EKEventStore.authorizationStatus(for: EKEntityType.event)
         
         switch (status) {
@@ -499,7 +426,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             }
         }
     }
-
+    
     func goToPopupAndSetReminder () {
         let dpVC = DatePickerPopupViewController()
         dpVC.dateForCalendar = false
