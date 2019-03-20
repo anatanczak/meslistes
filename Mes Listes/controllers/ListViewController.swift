@@ -16,48 +16,19 @@ import StoreKit
 
 class ListViewController: UIViewController {
     
-    //MARK: - Constants
-    private let cellHeight: CGFloat = 70
-    private let minimumSwipeCellWidth: CGFloat = 70.0
-    private let timeIntervalForEndDate: Double = 3600
     
-    private let settingsAlertTitleCalendar = "We need your permission"
-    private let settingsAlertMessageCalendar = "Change your settings"
-    private var notificationTitle = "Don't forget!"
-    private var notificationBody = ""
-    private let settingsAlertTitleNotification = "We need your permission"
-    private let settingAlertMessageNotification = "Go to settings"
-    private let navigationTitle = "meslistes"
+    
     private let cellIdentifier = "ListeTableViewController"
-    var rightNavigationBarImage = UIImage(named: "plus-icon")
-    
-    private let navigationBarTitleAttributes = [NSAttributedString.Key.font: UIFont(name: "Zing Sans Rust Regular", size: 28.5)!, NSAttributedString.Key.foregroundColor: UIColor.black]
-    
-    private let swipeCellBackgroundColorForDefault = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
-    private let swipeCellBackGroundColorForDestructive = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
-    private let separatorCustomColor = UIColor.init(red: 251/255, green: 251/255, blue: 251/255, alpha: 1)
-    
-    private let backgroundImage = #imageLiteral(resourceName: "background-image")
-    private let strikeOutImage = #imageLiteral(resourceName: "strikeout-icon")
-    private let reminderImage = UIImage(named: "reminder-icon")
-    private let addEventToCalendarImage = #imageLiteral(resourceName: "calendar-icon")
-    private let deleteImage = #imageLiteral(resourceName: "trash-icon")
-    
+    var chosenNameforCalendar = ""
+
     //MARK: - Properties
     let backgroundImageView: UIImageView = UIImageView()
     let tableView = UITableView()
     
     let helperRealmManager = HelperRealmManager()
-    
-    //    let realm = try! Realm()
-    // var lists : Results <Liste>?
-    
-    
-    var chosenNameforCalendar = ""
-    var notificationTitleForReminder = ""
+
     var isSwipeRightEnabled = true
-    
-    
+  
     let eventStore = EKEventStore()
     
     //MARK: - Life Cycle
@@ -69,18 +40,14 @@ class ListViewController: UIViewController {
         setupLayout()
         
         countAppLaunchesSwitchOnThem()
-        
-        
     }
-    
-    
-    
+  
     private func setupNavigationBar () {
         
-        self.title = navigationTitle
-        navigationController?.navigationBar.titleTextAttributes = navigationBarTitleAttributes
-        rightNavigationBarImage = rightNavigationBarImage?.withRenderingMode(.alwaysOriginal)
-        let rightNavigationButton = UIBarButtonItem(image: rightNavigationBarImage, style: .plain, target: self, action: #selector (rightBarButtonAction))
+        self.title = navigationBar.title
+        navigationController?.navigationBar.titleTextAttributes = navigationBar.titleAttributes
+        navigationBar.rightButtonImage = navigationBar.rightButtonImage?.withRenderingMode(.alwaysOriginal)
+        let rightNavigationButton = UIBarButtonItem(image: navigationBar.rightButtonImage, style: .plain, target: self, action: #selector (rightBarButtonAction))
         self.navigationItem.setRightBarButton(rightNavigationButton, animated: false)
     }
     
@@ -96,14 +63,14 @@ class ListViewController: UIViewController {
     
     //MARK: - Layout
     private func setupView () {
-        self.view.layer.contents = backgroundImage.cgImage
+        self.view.layer.contents = imageInListController.background.cgImage
 
         //tableView
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(ListeTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.backgroundColor = UIColor.clear
-        tableView.separatorColor = separatorCustomColor
+        tableView.separatorColor = color.separatorCustomColor
         tableView.separatorStyle = .singleLine
         tableView.separatorInset = .zero
         
@@ -112,7 +79,6 @@ class ListViewController: UIViewController {
     
     private func setupLayout() {
         
-    
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -136,7 +102,7 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return cellHeight
+        return ListConctollerCellMesurements.cellHeight
     }
     
     // data source methhods
@@ -169,8 +135,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
             let strikeOut = SwipeAction(style: .default, title: nil) {[weak self](action, indexPath) in
                 self?.strikeOut(at: indexPath)
             }
-            strikeOut.image = strikeOutImage
-            strikeOut.backgroundColor = self.swipeCellBackgroundColorForDefault
+            strikeOut.image = imageInListController.strikeOutForSwipeCell
+            strikeOut.backgroundColor = color.swipeCellBackgroundColorForDefault
             
             //REMINDER
             let setReminder = SwipeAction(style: .default, title: nil) { [weak self](action, indexPath) in
@@ -178,8 +144,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            setReminder.image = reminderImage
-            setReminder.backgroundColor = self.swipeCellBackgroundColorForDefault
+            setReminder.image = imageInListController.reminderForSwipeCell
+            setReminder.backgroundColor = color.swipeCellBackgroundColorForDefault
             
             //CALENDAR
             let addEventToCalendar = SwipeAction(style: .default, title: nil) {[weak self] (action, indexPath) in
@@ -187,8 +153,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            addEventToCalendar.image = addEventToCalendarImage
-            addEventToCalendar.backgroundColor = self.swipeCellBackgroundColorForDefault
+            addEventToCalendar.image = imageInListController.addEventToCalendarForSwipeCell
+            addEventToCalendar.backgroundColor = color.swipeCellBackgroundColorForDefault
             
             return[strikeOut, setReminder, addEventToCalendar]
             
@@ -198,14 +164,15 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            changeTextAction.backgroundColor = self.swipeCellBackgroundColorForDefault
+            changeTextAction.backgroundColor = color.swipeCellBackgroundColorForDefault
+            changeTextAction.image = imageInListController.changeTitleForSwipeCell
             
             //DELETE
             let deleteAction = SwipeAction(style: .destructive, title: nil) {[weak self] (action, indexPath) in
                 self?.deleteListe(at: indexPath)
             }
-            deleteAction.image = deleteImage
-            deleteAction.backgroundColor = self.swipeCellBackGroundColorForDestructive
+            deleteAction.image = imageInListController.deleteForSwipeCell
+            deleteAction.backgroundColor = color.swipeCellBackGroundColorForDestructive
             
             return [deleteAction, changeTextAction]
         }
@@ -219,12 +186,12 @@ extension ListViewController: SwipeTableViewCellDelegate {
       
         //diferent expansion styles
         options.expansionStyle = orientation == .left ? .selection : .destructive
-        options.minimumButtonWidth = minimumSwipeCellWidth
+        options.minimumButtonWidth = ListConctollerCellMesurements.minimumSwipeCellWidth
         return options
     }
     
     func addReminder(at indexpath: IndexPath) {
-        notificationTitle = helperRealmManager.lists![indexpath.row].name
+        notificationReminder.body = helperRealmManager.lists![indexpath.row].name
         getNotificationSettingStatus()
     }
     
@@ -305,18 +272,18 @@ extension ListViewController: SwipeTableViewCellDelegate {
     
     func threeHardCodedExamples () {
         let firstListe = Liste()
-        firstListe.name = "Shopping list"
-        firstListe.iconName = "shopping-cart-icon"
+        firstListe.name = listNames.name1
+        firstListe.iconName = icons.gray[3]
         helperRealmManager.save(list: firstListe)
         
         let secondListe = Liste()
-        secondListe.name = "To do"
-        secondListe.iconName = "todo-icon"
+        secondListe.name = listNames.name2
+        secondListe.iconName = icons.gray[0]
         helperRealmManager.save(list: secondListe)
         
         let thirdListe = Liste()
-        thirdListe.name = "Travelpack"
-        thirdListe.iconName = "airplane-icon"
+        thirdListe.name = listNames.name3
+        thirdListe.iconName = icons.gray[2]
         helperRealmManager.save(list: thirdListe)
         
     }
@@ -341,7 +308,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         
         event.title = self.chosenNameforCalendar
         event.startDate = date
-        event.endDate = date.addingTimeInterval(timeIntervalForEndDate)
+        event.endDate = date.addingTimeInterval(timeIntervals.timeIntervalForEndDate)
         event.calendar = eventStore.defaultCalendarForNewEvents
         do  {
             try eventStore.save(event, span: .thisEvent)
@@ -363,17 +330,19 @@ extension ListViewController: SwipeTableViewCellDelegate {
             goToPopupAndSaveEvent()
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            goToSettingsAllert(alertTitle: settingsAlertTitleCalendar, alertMessage: settingsAlertMessageCalendar)
+            goToSettingsAllert(alertTitle: settingsAlert.title, alertMessage: settingsAlert.message)
         }
     }
     
     func firstTimeAccessToCalendar () {
         
         eventStore.requestAccess(to: .event) {[weak self] (granted, error) in
+            guard let `self` = self else {return}
+            
             if granted {
-                self?.goToPopupAndSaveEvent()
+                self.goToPopupAndSaveEvent()
             }else{
-                self?.goToSettingsAllert(alertTitle: self!.settingsAlertTitleCalendar, alertMessage: self!.settingsAlertMessageCalendar)
+                self.goToSettingsAllert(alertTitle: settingsAlert.title, alertMessage: settingsAlert.message)
             }
         }
     }
@@ -408,21 +377,16 @@ extension ListViewController: SwipeTableViewCellDelegate {
     func getNotificationSettingStatus () {
         
         UNUserNotificationCenter.current().getNotificationSettings {[weak self] (settings) in
+            guard let `self` = self else {return}
             
             switch settings.authorizationStatus {
             case .authorized:
                 DispatchQueue.main.sync {
                     // UI work here
-                    self!.goToPopupAndSetReminder()
+                    self.goToPopupAndSetReminder()
                 }  
-            case .denied:
-                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
-            case .notDetermined:
-                print("casenotDetermined is highly unlikely")
-                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
-            case .provisional:
-                print("caseProvisional is highly unlikely")
-                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
+            case .denied, .notDetermined, .provisional:
+                self.goToSettingsAllert(alertTitle: settingsAlert.title, alertMessage: settingsAlert.message)
             }
         }
     }
@@ -438,8 +402,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
     func setReminder (_ components: DateComponents) ->(){
         
         let content = UNMutableNotificationContent()
-        content.title = notificationTitle
-        content.body = notificationBody
+        content.title = notificationReminder.title
+        content.body = notificationReminder.body
         content.sound = UNNotificationSound.default
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
         let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)

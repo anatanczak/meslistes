@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0275788A4B58FFC460D20C8E /* Pods_Mes_Listes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3A93D742BF7FE4BCFE3ABA8E /* Pods_Mes_Listes.framework */; };
 		4C0846F7223946080027F605 /* HelperRealmManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0846F6223946080027F605 /* HelperRealmManager.swift */; };
+		4C09FB262241503C0099DD0C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C09FB252241503C0099DD0C /* Constants.swift */; };
 		4C1C5898212C4E240084AF39 /* AutoLayoutAnchorEXT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1C5897212C4E240084AF39 /* AutoLayoutAnchorEXT.swift */; };
 		4C1DFC0820DFEBB200F3D459 /* ItemTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1DFC0720DFEBB200F3D459 /* ItemTableViewController.swift */; };
 		4C1DFC0A20DFF91800F3D459 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1DFC0920DFF91800F3D459 /* Item.swift */; };
@@ -36,6 +37,7 @@
 /* Begin PBXFileReference section */
 		3A93D742BF7FE4BCFE3ABA8E /* Pods_Mes_Listes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Mes_Listes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C0846F6223946080027F605 /* HelperRealmManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperRealmManager.swift; sourceTree = "<group>"; };
+		4C09FB252241503C0099DD0C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		4C1C5897212C4E240084AF39 /* AutoLayoutAnchorEXT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoLayoutAnchorEXT.swift; sourceTree = "<group>"; };
 		4C1DFC0720DFEBB200F3D459 /* ItemTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemTableViewController.swift; sourceTree = "<group>"; };
 		4C1DFC0920DFF91800F3D459 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
@@ -134,6 +136,7 @@
 		4C239AAB20D51BA7004A0089 /* supporting files */ = {
 			isa = PBXGroup;
 			children = (
+				4C09FB252241503C0099DD0C /* Constants.swift */,
 				4CA5BE41212AFDF300EB6457 /* extensions */,
 				4C239A9820D51B37004A0089 /* Assets.xcassets */,
 				4CA5BE352127703E00EB6457 /* Fonts */,
@@ -345,6 +348,7 @@
 				4CAE3A7921BFFC6600CFDE65 /* ImageVC.swift in Sources */,
 				4C239AA820D51B73004A0089 /* ListViewController.swift in Sources */,
 				4C239AA620D51B73004A0089 /* Liste.swift in Sources */,
+				4C09FB262241503C0099DD0C /* Constants.swift in Sources */,
 				4C0846F7223946080027F605 /* HelperRealmManager.swift in Sources */,
 				4CA5BE43212AFE1700EB6457 /* ViewController.swift in Sources */,
 				4C907F2A2233F30A008C0BC2 /* HelperFileManager.swift in Sources */,

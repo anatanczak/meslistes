@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import RealmSwift
+//import RealmSwift
 import UserNotifications
 import EventKit
 import SwipeCellKit
@@ -51,6 +51,7 @@ class ItemTableViewController: UIViewController {
     private let addEventToCalendarImage = #imageLiteral(resourceName: "calendar-item-icon")
     private let deleteImage = #imageLiteral(resourceName: "delete-item-icon")
     private let takePhotoImage = #imageLiteral(resourceName: "camera-icon")
+    private let changeTitleImage = UIImage(named: "editTitle-item-icon")
     
     private let swipeCellBackgroundColorCustomPink = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
     private let swipeCellBackgroundColorCustomRed = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
@@ -60,11 +61,12 @@ class ItemTableViewController: UIViewController {
     private let navigationBarAttributes2 = [NSAttributedString.Key.font: UIFont(name: "Zing Sans Rust Regular", size: 28.5)!, NSAttributedString.Key.foregroundColor: UIColor.black]
     
     //MARK: - Properties
-    let realm = try! Realm()
-    var items : Results <Item>?
+    //let realm = try! Realm()
+   
     
     //get access to shared instance of the file manager
     let helperFileManager = HelperFileManager()
+    let helperRealmManager = HelperRealmManager()
     
     var nameOfTheSelectedListe = ""
     var selectedRowToAddTheImage: Int?
@@ -89,7 +91,9 @@ class ItemTableViewController: UIViewController {
     
     var selectedListe : Liste? {
         didSet {
-            loadItems()
+            guard let listIsSet = selectedListe else {return}
+            helperRealmManager.loadItems(for: listIsSet)
+            tableView.reloadData()
         }
     }
     
@@ -277,59 +281,37 @@ class ItemTableViewController: UIViewController {
     
     //MARK: - Different Methods REALM
     
-    func createItem (){
-        if let currentListe = self.selectedListe {
-            
-            do {
-                try self.realm.write {
-                    let newItem = Item()
-                    newItem.id = UUID().uuidString
-                    newItem.title = textFieldItems.text!
-                    newItem.creationDate = Date()
-                    currentListe.items.append(newItem)
-                }
-            }catch{
-                print("Error saving item\(error)")
-            }
-        }
-    }
+
     
     func userInputHandeled(){
         
-        if textFieldItems.text != "" && textFieldItems.text != nil {
+        if textFieldItems.text != ""{
+            guard let textInput = textFieldItems.text else {return}
+            
             if  indexPathForItemToBEChanged != nil {
-                if let itemToBeEdited = self.items?[indexPathForItemToBEChanged!.row]{
-                    do {
-                        try self.realm.write {
-                            itemToBeEdited.title = textFieldItems.text!
-                        }
-                    }catch{
-                        print("Error saving item\(error)")
-                    }
-                   indexPathForItemToBEChanged =  nil
+                
+                if let itemToBeEdited = helperRealmManager.items?[indexPathForItemToBEChanged!.row]{
+                    
+                    helperRealmManager.changeItemTitle(for: itemToBeEdited, newTitle: textInput)
+                    
+                    indexPathForItemToBEChanged =  nil
                 }
+            }else{
+                guard let currentListe = selectedListe else {return}
+                helperRealmManager.createItem(in: currentListe, named: textInput)
             }
-            else{
-                createItem()
-            }
-
+            
             textFieldItems.text = ""
             tableView.reloadData()
             
-        }else if textFieldItems.text == "" && textFieldItems.text != nil{
+        }else{
             //TODO: - Textfield empty
             
-        }else{
-            print("text field is nill")
         }
     }
         
     
-    //retrieves data from the database
-    func loadItems () {
-        items = selectedListe?.items.sorted(byKeyPath: "creationDate", ascending: true)
-        tableView.reloadData()
-    }
+
     
     //Different Methods
     
@@ -467,7 +449,7 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return items?.count ?? 1
+        return helperRealmManager.items?.count ?? 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -475,7 +457,7 @@ extension ItemTableViewController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ItemTableViewCell", for: indexPath) as! ItemTableViewCell
         cell.delegate = self
         cell.itemDelegate = self
-        cell.fillWith(model: items?[indexPath.row])
+        cell.fillWith(model: helperRealmManager.items?[indexPath.row])
         cell.titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
         cell.titleTextView.adjustsFontForContentSizeCategory = true
         cell.titleTextView.isEditable = false
@@ -498,7 +480,7 @@ extension ItemTableViewController: ItemCellProtocol {
     
     func cellDidTapOnButton(at index: IndexPath) {
 
-        if let currentItem = items?[index.row] {
+        if let currentItem = helperRealmManager.items?[index.row] {
             let imageVC = ImageVC()
             imageVC.imageName = currentItem.imageName
             imageVC.modalPresentationStyle = .overCurrentContext
@@ -579,13 +561,13 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
             
             //edit title
             let editTitleAction = SwipeAction(style: .default, title: nil) {[weak self] (action, indexpath) in
-                //TODO: change title to the item
                 self?.showTitleToChangeInTextField(at: indexPath)
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
             editTitleAction.backgroundColor = swipeCellBackgroundColorCustomGray
-            //TODO: add icon for the button to change title
+            editTitleAction.image = changeTitleImage
+            
             return [deleteAction, takePhotoAction, editTitleAction]
         }
         
@@ -603,27 +585,15 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     }
     
     func deleteItem(at indexpath: IndexPath) {
+        indexPathForItemToBEChanged = nil
+        textFieldItems.text = ""
         
-
-        
-        if let itemForDeletion = self.items?[indexpath.row] {
-            if itemForDeletion.hasImage {
-                helperFileManager.deleteImageFromDirectory(named: itemForDeletion.imageName)
-            }
-            
-            do {
-                try self.realm.write {
-                    self.realm.delete(itemForDeletion)
-                }
-            }catch{
-                print("Error deleting item\(error)")
-            }
-        }
+        helperRealmManager.deleteItemFromRealm(at: indexpath.row)
     }
     
     func updateModelByAddingAReminder(at indexpath: IndexPath) {
         
-        notificationTitle = items![indexpath.row].title
+        notificationTitle = helperRealmManager.items![indexpath.row].title
         getNotificationSettingStatus()
     }
     
@@ -631,26 +601,18 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     
     func addEventToCalendar(at indexpath: IndexPath) {
 
-        chosenNameforCalendar = items![indexpath.row].title
+        chosenNameforCalendar = helperRealmManager.items![indexpath.row].title
         checkCalendarAuthorizationStatus()
     }
     
     
     //strikes out the text
     func strikeOut(at indexPath: IndexPath) {
-        if let currentItem = self.items?[indexPath.row] {
-            do {
-                try realm.write {
-                    currentItem.done = !currentItem.done
-                }
-            }catch{
-                print("error updating realm\(error)")
-            }
-        }
+       helperRealmManager.updateIsDoneForItem(at: indexPath.row)
     }
     
     func showTitleToChangeInTextField(at indexPath: IndexPath) {
-        if let currentItem = self.items?[indexPath.row] {
+        if let currentItem = helperRealmManager.items?[indexPath.row] {
             indexPathForItemToBEChanged = indexPath
             textFieldItems.text = currentItem.title
             textFieldItems.becomeFirstResponder()
@@ -664,13 +626,10 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
 extension ItemTableViewController: UITextFieldDelegate {
     
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        if let indexPath = indexPathForSwipedCell {
-        let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
-        cell.hideSwipe(animated: true)
-            indexPathForSwipedCell = nil
-        }
+        
         return true
     }
+        
     func textFieldDidBeginEditing(_ textField: UITextField) {
         //self.tableView.setEditing(false, animated: true)
     }
@@ -682,6 +641,13 @@ extension ItemTableViewController: UITextFieldDelegate {
         return true
         }
         return false
+    }
+    
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        //userInputHandeled()
+        textField.text = ""
+        indexPathForItemToBEChanged = nil
+        return true
     }
 }
 
@@ -758,7 +724,7 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
         case .notDetermined: requestCameraPermission()
         case .authorized:
            DispatchQueue.main.async {[weak self] in
-            self!.openCamera()
+            self?.openCamera()
             }
         case .restricted, .denied: goToSettingsAllert(alertTitle: settingAlertTitleCamera, alertMessage: settingAlertMessageCamera)
         }
@@ -784,9 +750,13 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
         //chose random name for the image
         
         if let itemIDString = itemID {
-        
-        let nameForSavedImage = helperFileManager.saveImageToDocumentDirectory(named: image, for: itemIDString)
-            saveImageNameAsStringToRealm(nameForSavedImage)
+            
+            let nameForSavedImage = helperFileManager.saveImageToDocumentDirectory(named: image, for: itemIDString)
+            
+            if let selectedRow = selectedRowToAddTheImage
+            {
+                helperRealmManager.saveImageNameAsStringToRealm(named: nameForSavedImage, at: selectedRow)
+            }
             tableView.reloadData()
         }
     }
@@ -796,31 +766,9 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
 
 extension ItemTableViewController
 {
-
-    func saveImageNameAsStringToRealm (_ imageName: String)
-    {
-        if let selectedRow = selectedRowToAddTheImage
-        {
-            if let currentItem = self.items?[selectedRow]
-            {
-                do {
-                    try realm.write
-                    {
-                        currentItem.hasImage = true
-                        currentItem.imageName = imageName
-                    }
-                }
-                catch
-                {
-                    print("error updating realm\(error)")
-                }
-            }
-        }
-    }
-    
     func getItemID () -> String? {
         if let selectedRow = selectedRowToAddTheImage {
-            if let currentItem = self.items?[selectedRow] {
+            if let currentItem = helperRealmManager.items?[selectedRow] {
                 let itemID = currentItem.id
                 return itemID
             }

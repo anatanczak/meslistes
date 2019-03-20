@@ -1,0 +1,68 @@
+//
+//  Constants.swift
+//  Mes Listes
+//
+//  Created by Anastasiia Tanczak on 19/03/2019.
+//  Copyright © 2019 Ana Viktoriv. All rights reserved.
+//
+
+import Foundation
+import UIKit
+
+enum ListConctollerCellMesurements {
+    
+     static let cellHeight: CGFloat = 70
+     static let minimumSwipeCellWidth: CGFloat = 70.0
+   
+}
+
+enum timeIntervals {
+ static let timeIntervalForEndDate: Double = 3600
+}
+
+enum settingsAlert {
+    static let title = "We need your permission"
+    static let message = "Go to settings"
+}
+
+enum notificationReminder {
+    static var title = "A little reminder:"
+    static var body = ""
+}
+
+enum navigationBar {
+    static let title = "meslistes"
+    
+    static var rightButtonImage = UIImage(named: "plus-icon")
+    
+    static let titleAttributes = [NSAttributedString.Key.font: UIFont(name: "Zing Sans Rust Regular", size: 28.5)!, NSAttributedString.Key.foregroundColor: UIColor.black]
+}
+
+enum imageInListController {
+    static let background = #imageLiteral(resourceName: "background-image")
+    static let strikeOutForSwipeCell = #imageLiteral(resourceName: "strikeout-icon")
+    static let reminderForSwipeCell = UIImage(named: "reminder-icon")
+    static let addEventToCalendarForSwipeCell = #imageLiteral(resourceName: "calendar-icon")
+    static let deleteForSwipeCell = #imageLiteral(resourceName: "trash-icon")
+    static let changeTitleForSwipeCell = UIImage (named: "editTitle-icon")
+}
+
+enum color {
+    static let swipeCellBackgroundColorForDefault = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
+    static let swipeCellBackGroundColorForDestructive = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
+    static let separatorCustomColor = UIColor.init(red: 251/255, green: 251/255, blue: 251/255, alpha: 1)
+}
+
+enum listNames {
+    static var name1 = "Shopping list"
+    static var name2 = "To do"
+    static var name3 = "Travelpack"
+}
+
+enum icons {
+    static let gray = ["todo-icon", "star-icon", "airplane-icon", "shopping-cart-icon", "home-icon", "clothes-icon", "gift-icon", "bag-icon", "light-bulb-icon", "sport-icon", "cooking-icon", "book-icon"]
+    
+    static let rose = ["todo-icon-rose", "star-icon-rose", "airplane-icon-rose", "shopping-cart-icon-rose", "home-icon-rose", "clothes-icon-rose", "gift-icon-rose", "bag-icon-rose", "light-bulb-icon-rose", "sport-icon-rose", "cooking-icon-rose", "book-icon-rose"]
+    
+    static let standartIconName = "empty-big-circle"
+}

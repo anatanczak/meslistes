@@ -13,10 +13,7 @@ class UserTextInputViewController: UIViewController {
     //MARK: Constants
     
     
-    private let iconNamesArray = ["todo-icon", "star-icon", "airplane-icon", "shopping-cart-icon", "home-icon", "clothes-icon", "gift-icon", "bag-icon", "light-bulb-icon", "sport-icon", "cooking-icon", "book-icon"]
-    
-    private let roseIconNamesArray = ["todo-icon-rose", "star-icon-rose", "airplane-icon-rose", "shopping-cart-icon-rose", "home-icon-rose", "clothes-icon-rose", "gift-icon-rose", "bag-icon-rose", "light-bulb-icon-rose", "sport-icon-rose", "cooking-icon-rose", "book-icon-rose"]
-    private let standartIconName = "empty-big-circle"
+
     let alertViewGrayColor = UIColor(red: 224.0/255.0, green: 224.0/255.0, blue: 224.0/255.0, alpha: 1)
     
     let textFieldPlaceHolderTextLitteral = "name your new list..."
@@ -246,7 +243,7 @@ class UserTextInputViewController: UIViewController {
         if textFieldForInput.text != "" && textFieldForInput.text != nil {
             if changingNameAndIcon, let listeToUpdateUnwrapped = listeToUpdate {
                 
-                var temporaryIconName = standartIconName
+                var temporaryIconName = icons.standartIconName
                 if let iconNameLocal = listeToUpdateUnwrapped.iconName {
                     temporaryIconName = iconNameLocal
                 }
@@ -315,7 +312,7 @@ extension UserTextInputViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
-        cell.layer.contents = UIImage(named: iconNamesArray[indexPath.row])?.cgImage
+        cell.layer.contents = UIImage(named: icons.gray[indexPath.row])?.cgImage
         cell.contentMode = .scaleAspectFit
         return cell
     }
@@ -326,15 +323,15 @@ extension UserTextInputViewController: UICollectionViewDelegate, UICollectionVie
 
             let cellToUnselect = collectionView.cellForItem(at: unwrappedSelectedIndexPath)
 
-            cellToUnselect?.layer.contents = UIImage (named: iconNamesArray[unwrappedSelectedIndexPath.row])?.cgImage
+            cellToUnselect?.layer.contents = UIImage (named: icons.gray[unwrappedSelectedIndexPath.row])?.cgImage
             cellToUnselect?.contentMode = .scaleAspectFit
         }
         let cell = collectionView.cellForItem(at: indexPath)
        
-        cell?.layer.contents = UIImage(named: roseIconNamesArray[indexPath.row])?.cgImage
+        cell?.layer.contents = UIImage(named: icons.rose[indexPath.row])?.cgImage
         cell?.contentMode = .scaleAspectFit
         selectedIndexPath = indexPath
-        iconName = iconNamesArray[indexPath.row]
+        iconName = icons.gray[indexPath.row]
     }
 
 }
