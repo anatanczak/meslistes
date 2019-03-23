@@ -243,7 +243,7 @@ class UserTextInputViewController: UIViewController {
         if textFieldForInput.text != "" && textFieldForInput.text != nil {
             if changingNameAndIcon, let listeToUpdateUnwrapped = listeToUpdate {
                 
-                var temporaryIconName = icons.standartIconName
+                var temporaryIconName = Icons.standartIconName
                 if let iconNameLocal = listeToUpdateUnwrapped.iconName {
                     temporaryIconName = iconNameLocal
                 }
@@ -312,7 +312,7 @@ extension UserTextInputViewController: UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
-        cell.layer.contents = UIImage(named: icons.gray[indexPath.row])?.cgImage
+        cell.layer.contents = UIImage(named: Icons.gray[indexPath.row])?.cgImage
         cell.contentMode = .scaleAspectFit
         return cell
     }
@@ -323,15 +323,15 @@ extension UserTextInputViewController: UICollectionViewDelegate, UICollectionVie
 
             let cellToUnselect = collectionView.cellForItem(at: unwrappedSelectedIndexPath)
 
-            cellToUnselect?.layer.contents = UIImage (named: icons.gray[unwrappedSelectedIndexPath.row])?.cgImage
+            cellToUnselect?.layer.contents = UIImage (named: Icons.gray[unwrappedSelectedIndexPath.row])?.cgImage
             cellToUnselect?.contentMode = .scaleAspectFit
         }
         let cell = collectionView.cellForItem(at: indexPath)
        
-        cell?.layer.contents = UIImage(named: icons.rose[indexPath.row])?.cgImage
+        cell?.layer.contents = UIImage(named: Icons.rose[indexPath.row])?.cgImage
         cell?.contentMode = .scaleAspectFit
         selectedIndexPath = indexPath
-        iconName = icons.gray[indexPath.row]
+        iconName = Icons.gray[indexPath.row]
     }
 
 }

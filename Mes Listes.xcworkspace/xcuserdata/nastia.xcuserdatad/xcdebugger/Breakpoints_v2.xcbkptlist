@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Mes Listes/controllers/ItemTableViewController.swift"
-            timestampString = "574794941.057605"
+            timestampString = "575022666.834757"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "737"
-            endingLineNumber = "737"
-            landmarkName = "imagePickerController(_:didFinishPickingMediaWithInfo:)"
+            startingLineNumber = "733"
+            endingLineNumber = "733"
+            landmarkName = "requestCameraPermission()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,12 +26,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Mes Listes/controllers/ItemTableViewController.swift"
-            timestampString = "574794941.0576741"
+            timestampString = "575022666.84302"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "708"
-            endingLineNumber = "708"
-            landmarkName = "openGallery()"
+            startingLineNumber = "704"
+            endingLineNumber = "704"
+            landmarkName = "openCamera()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

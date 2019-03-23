@@ -16,11 +16,8 @@ import AVFoundation
 class ItemTableViewController: UIViewController {
     
     //MARK: - Constants
-    private let textFieldPlaceholderText = "Type your item here..."
-    private let textFieldHeight: CGFloat = 40
-    private let textFieldAndPlusButtonPadding: CGFloat = 10
-    private let subviewTextFiledPaddingRightLeft: CGFloat = 5
-    private let distanceBetweenTextfieldAndTableView: CGFloat = 10
+  let subviewTextFiledPaddingRightLeft: CGFloat = 5
+    
     private let borderSubView: CGFloat = 1
     private let navigationBarTopInset: CGFloat = 0
     private let navigationBarBottomInset: CGFloat = 0
@@ -40,8 +37,7 @@ class ItemTableViewController: UIViewController {
     private let settingAlertTitleCamera = "The camera permission was denied"
     private let settingAlertMessageCamera = "Please enable it in Settings to continue"
     private var chosenNameforCalendar = ""
-    private var notificationTitle = ""
-    private var notificationBody = ""
+
     
     private let leftNavigationBarButtonImage = #imageLiteral(resourceName: "back-button-icon")
     private let plusBottonImage = #imageLiteral(resourceName: "plus-icon-gray")
@@ -175,7 +171,7 @@ class ItemTableViewController: UIViewController {
         
         //textField
         textFieldItems.backgroundColor = .clear
-        textFieldItems.placeholder = textFieldPlaceholderText
+        textFieldItems.placeholder = TextFieldItems.placeholderText
         textFieldItems.delegate = self
         textFieldItems.returnKeyType = UIReturnKeyType.next
 
@@ -212,7 +208,7 @@ class ItemTableViewController: UIViewController {
             subviewForTextFieldAndPlusButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             subviewForTextFieldAndPlusButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: subviewTextFiledPaddingRightLeft),
             subviewForTextFieldAndPlusButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -subviewTextFiledPaddingRightLeft),
-            subviewForTextFieldAndPlusButton.heightAnchor.constraint(equalToConstant: textFieldHeight + 2 * borderSubView)
+            subviewForTextFieldAndPlusButton.heightAnchor.constraint(equalToConstant: TextFieldItems.height + 2 * borderSubView)
             ])
         
         
@@ -221,8 +217,8 @@ class ItemTableViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             textFieldItems.topAnchor.constraint(equalTo: subviewForTextFieldAndPlusButton.topAnchor, constant: borderSubView),
-            textFieldItems.leadingAnchor.constraint(equalTo: subviewForTextFieldAndPlusButton.leadingAnchor, constant: textFieldAndPlusButtonPadding),
-            textFieldItems.heightAnchor.constraint(equalToConstant: textFieldHeight)
+            textFieldItems.leadingAnchor.constraint(equalTo: subviewForTextFieldAndPlusButton.leadingAnchor, constant: TextFieldItems.distanceFromPlusButton),
+            textFieldItems.heightAnchor.constraint(equalToConstant: TextFieldItems.height)
             ])
         
         //plusButton
@@ -240,7 +236,7 @@ class ItemTableViewController: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: subviewForTextFieldAndPlusButton.bottomAnchor, constant: distanceBetweenTextfieldAndTableView),
+            tableView.topAnchor.constraint(equalTo: subviewForTextFieldAndPlusButton.bottomAnchor, constant: TextFieldItems.distanceFromTableView),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
@@ -430,11 +426,11 @@ class ItemTableViewController: UIViewController {
     func setReminder (_ components: DateComponents) ->(){
         
         let content = UNMutableNotificationContent()
-        content.title = notificationTitle
-        content.body = notificationBody
+        content.title = NotificationReminder.title
+        content.body = NotificationReminder.body
         content.sound = UNNotificationSound.default
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: NotificationReminder.body, content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request) { (error) in
             if let error = error {
@@ -593,7 +589,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
     
     func updateModelByAddingAReminder(at indexpath: IndexPath) {
         
-        notificationTitle = helperRealmManager.items![indexpath.row].title
+        NotificationReminder.body = helperRealmManager.items![indexpath.row].title
         getNotificationSettingStatus()
     }
     

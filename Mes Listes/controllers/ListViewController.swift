@@ -44,10 +44,10 @@ class ListViewController: UIViewController {
   
     private func setupNavigationBar () {
         
-        self.title = navigationBar.title
-        navigationController?.navigationBar.titleTextAttributes = navigationBar.titleAttributes
-        navigationBar.rightButtonImage = navigationBar.rightButtonImage?.withRenderingMode(.alwaysOriginal)
-        let rightNavigationButton = UIBarButtonItem(image: navigationBar.rightButtonImage, style: .plain, target: self, action: #selector (rightBarButtonAction))
+        self.title = NavigationBar.title
+        navigationController?.navigationBar.titleTextAttributes = NavigationBar.titleAttributes
+        NavigationBar.rightButtonImage = NavigationBar.rightButtonImage?.withRenderingMode(.alwaysOriginal)
+        let rightNavigationButton = UIBarButtonItem(image: NavigationBar.rightButtonImage, style: .plain, target: self, action: #selector (rightBarButtonAction))
         self.navigationItem.setRightBarButton(rightNavigationButton, animated: false)
     }
     
@@ -63,14 +63,14 @@ class ListViewController: UIViewController {
     
     //MARK: - Layout
     private func setupView () {
-        self.view.layer.contents = imageInListController.background.cgImage
+        self.view.layer.contents = ImageInListController.background.cgImage
 
         //tableView
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(ListeTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.backgroundColor = UIColor.clear
-        tableView.separatorColor = color.separatorCustomColor
+        tableView.separatorColor = Color.separatorCustomColor
         tableView.separatorStyle = .singleLine
         tableView.separatorInset = .zero
         
@@ -135,8 +135,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
             let strikeOut = SwipeAction(style: .default, title: nil) {[weak self](action, indexPath) in
                 self?.strikeOut(at: indexPath)
             }
-            strikeOut.image = imageInListController.strikeOutForSwipeCell
-            strikeOut.backgroundColor = color.swipeCellBackgroundColorForDefault
+            strikeOut.image = ImageInListController.strikeOutForSwipeCell
+            strikeOut.backgroundColor = Color.swipeCellBackgroundColorForDefault
             
             //REMINDER
             let setReminder = SwipeAction(style: .default, title: nil) { [weak self](action, indexPath) in
@@ -144,8 +144,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            setReminder.image = imageInListController.reminderForSwipeCell
-            setReminder.backgroundColor = color.swipeCellBackgroundColorForDefault
+            setReminder.image = ImageInListController.reminderForSwipeCell
+            setReminder.backgroundColor = Color.swipeCellBackgroundColorForDefault
             
             //CALENDAR
             let addEventToCalendar = SwipeAction(style: .default, title: nil) {[weak self] (action, indexPath) in
@@ -153,8 +153,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            addEventToCalendar.image = imageInListController.addEventToCalendarForSwipeCell
-            addEventToCalendar.backgroundColor = color.swipeCellBackgroundColorForDefault
+            addEventToCalendar.image = ImageInListController.addEventToCalendarForSwipeCell
+            addEventToCalendar.backgroundColor = Color.swipeCellBackgroundColorForDefault
             
             return[strikeOut, setReminder, addEventToCalendar]
             
@@ -164,15 +164,15 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            changeTextAction.backgroundColor = color.swipeCellBackgroundColorForDefault
-            changeTextAction.image = imageInListController.changeTitleForSwipeCell
+            changeTextAction.backgroundColor = Color.swipeCellBackgroundColorForDefault
+            changeTextAction.image = ImageInListController.changeTitleForSwipeCell
             
             //DELETE
             let deleteAction = SwipeAction(style: .destructive, title: nil) {[weak self] (action, indexPath) in
                 self?.deleteListe(at: indexPath)
             }
-            deleteAction.image = imageInListController.deleteForSwipeCell
-            deleteAction.backgroundColor = color.swipeCellBackGroundColorForDestructive
+            deleteAction.image = ImageInListController.deleteForSwipeCell
+            deleteAction.backgroundColor = Color.swipeCellBackGroundColorForDestructive
             
             return [deleteAction, changeTextAction]
         }
@@ -191,7 +191,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
     }
     
     func addReminder(at indexpath: IndexPath) {
-        notificationReminder.body = helperRealmManager.lists![indexpath.row].name
+        NotificationReminder.body = helperRealmManager.lists![indexpath.row].name
         getNotificationSettingStatus()
     }
     
@@ -272,18 +272,18 @@ extension ListViewController: SwipeTableViewCellDelegate {
     
     func threeHardCodedExamples () {
         let firstListe = Liste()
-        firstListe.name = listNames.name1
-        firstListe.iconName = icons.gray[3]
+        firstListe.name = ListNames.name1
+        firstListe.iconName = Icons.gray[3]
         helperRealmManager.save(list: firstListe)
         
         let secondListe = Liste()
-        secondListe.name = listNames.name2
-        secondListe.iconName = icons.gray[0]
+        secondListe.name = ListNames.name2
+        secondListe.iconName = Icons.gray[0]
         helperRealmManager.save(list: secondListe)
         
         let thirdListe = Liste()
-        thirdListe.name = listNames.name3
-        thirdListe.iconName = icons.gray[2]
+        thirdListe.name = ListNames.name3
+        thirdListe.iconName = Icons.gray[2]
         helperRealmManager.save(list: thirdListe)
         
     }
@@ -308,7 +308,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         
         event.title = self.chosenNameforCalendar
         event.startDate = date
-        event.endDate = date.addingTimeInterval(timeIntervals.timeIntervalForEndDate)
+        event.endDate = date.addingTimeInterval(TimeIntervals.timeIntervalForEndDate)
         event.calendar = eventStore.defaultCalendarForNewEvents
         do  {
             try eventStore.save(event, span: .thisEvent)
@@ -330,7 +330,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             goToPopupAndSaveEvent()
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            goToSettingsAllert(alertTitle: settingsAlert.title, alertMessage: settingsAlert.message)
+            goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
         }
     }
     
@@ -342,7 +342,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             if granted {
                 self.goToPopupAndSaveEvent()
             }else{
-                self.goToSettingsAllert(alertTitle: settingsAlert.title, alertMessage: settingsAlert.message)
+                self.goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
             }
         }
     }
@@ -386,7 +386,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
                     self.goToPopupAndSetReminder()
                 }  
             case .denied, .notDetermined, .provisional:
-                self.goToSettingsAllert(alertTitle: settingsAlert.title, alertMessage: settingsAlert.message)
+                self.goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
             }
         }
     }
@@ -402,13 +402,15 @@ extension ListViewController: SwipeTableViewCellDelegate {
     func setReminder (_ components: DateComponents) ->(){
         
         let content = UNMutableNotificationContent()
-        content.title = notificationReminder.title
-        content.body = notificationReminder.body
+        content.title = NotificationReminder.title
+        content.body = NotificationReminder.body
         content.sound = UNNotificationSound.default
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
-        let request = UNNotificationRequest(identifier: "TestIdentifier", content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: content.body, content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request) { (error) in
+            print(request.identifier)
+            
             if let error = error {
                 print(" We had an error: \(error)")
                 
