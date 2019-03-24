@@ -146,17 +146,14 @@ class HelperRealmManager {
     
     func saveImageNameAsStringToRealm (named imageName: String, at row: Int){
 
-            if let currentItem = items?[row]
-            {
+            if let currentItem = items?[row]{
                 do {
-                    try realm.write
-                    {
+                    try realm.write{
                         currentItem.hasImage = true
                         currentItem.imageName = imageName
                     }
                 }
-                catch
-                {
+                catch{
                     print("error updating realm\(error)")
                 }
             }

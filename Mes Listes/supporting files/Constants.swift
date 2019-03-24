@@ -23,6 +23,8 @@ enum TimeIntervals {
 enum SettingsAlert {
     static let title = "We need your permission"
     static let message = "Go to settings"
+    static let settingActionTitle = "Settings"
+    static let cancelActionTitle = "Cancel"
 }
 
 enum NotificationReminder {
@@ -73,3 +75,16 @@ enum TextFieldItems {
     static let distanceFromPlusButton: CGFloat = 10
     static let distanceFromTableView: CGFloat = 10
 }
+
+enum AlertCameraPhotoLibrary {
+    static let cameraActionTitle = "Take picture with Camera"
+    static let photoLibraryActionTitle = "Choose from Photo Library"
+    static let cancelActionTitle = "Cancel"
+}
+
+enum NoCameraAlert {
+    static let title = "Warning"
+    static let message = "You don't have camera"
+    static let okActionTitle = "OK"
+}
+

@@ -25,15 +25,15 @@ class HelperFileManager {
         }
     }
     
-    func saveImageToDocumentDirectory (named image: UIImage, for itemID: String) -> String {
+    func saveImageToDocumentDirectory (named image: UIImage, for imageName: String) {
         
         //get the url for the users home directory
         let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first!
         
-        let nameForImage = "\(itemID).png"
+        
         
         //create the variable that stores the name
-        let filePath = documentsURL.appendingPathComponent("\(nameForImage)")
+        let filePath = documentsURL.appendingPathComponent("\(imageName)")
         
         //write data
         do {
@@ -41,7 +41,7 @@ class HelperFileManager {
         } catch {
             print(error)
         }
-        return nameForImage
+        
     }
     
     func getImage(imageName : String)-> UIImage {

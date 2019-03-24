@@ -19,23 +19,24 @@ class ItemTableViewController: UIViewController {
   let subviewTextFiledPaddingRightLeft: CGFloat = 5
     
     private let borderSubView: CGFloat = 1
+    
+    //!!!!!!!NavigationBarImageInsets
     private let navigationBarTopInset: CGFloat = 0
     private let navigationBarBottomInset: CGFloat = 0
     private let navigationBarLeftInset: CGFloat = -4
     private let navigationBarRightInset: CGFloat = 0
+    
     private let subviewForTextFieldAndPlusButtonCornerRadius: CGFloat = 10
     private let subviewForTextFieldAndPlusButtonBorderWidth: CGFloat = 1
+    
     private let separatorInset: CGFloat = 0
     private let estimatedRowHeight: CGFloat = 100
+    
     private let timeIntervalForCalendar: Double = 3600
+    
     private let swipeCellMinimumButtonWidth: CGFloat = 45.0
     
-    private let settingsAlertTitleCalendar = "The calendar permission was not authorized"
-    private let settingsAlertMessageCalendar = "Please enable it in Settings to continue"
-    private let settingsAlertTitleNotification = "Unable to use notifications"
-    private let settingAlertMessageNotification = "Please go to Setting to change your preferences"
-    private let settingAlertTitleCamera = "The camera permission was denied"
-    private let settingAlertMessageCamera = "Please enable it in Settings to continue"
+
     private var chosenNameforCalendar = ""
 
     
@@ -49,10 +50,9 @@ class ItemTableViewController: UIViewController {
     private let takePhotoImage = #imageLiteral(resourceName: "camera-icon")
     private let changeTitleImage = UIImage(named: "editTitle-item-icon")
     
-    private let swipeCellBackgroundColorCustomPink = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
-    private let swipeCellBackgroundColorCustomRed = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
-    private let swipeCellBackgroundColorCustomGray = UIColor.init(red: 185/255, green: 205/255, blue: 214/255, alpha: 1)
-    
+//    private let swipeCellBackgroundColorCustomPink = UIColor.init(red: 240/255, green: 214/255, blue: 226/255, alpha: 1)
+//    private let swipeCellBackgroundColorCustomRed = UIColor.init(red: 242/255, green: 93/255, blue: 97/255, alpha: 1)
+
     private let navigationBarAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 19, weight: .light), NSAttributedString.Key.foregroundColor: UIColor.black]
     private let navigationBarAttributes2 = [NSAttributedString.Key.font: UIFont(name: "Zing Sans Rust Regular", size: 28.5)!, NSAttributedString.Key.foregroundColor: UIColor.black]
     
@@ -250,24 +250,6 @@ class ItemTableViewController: UIViewController {
     }
     
     @objc func leftBarButtonAction () {
-        //TODO: Delete all empty items
-//        if let itemsArray = items {
-//            for item in itemsArray {
-//                if item.title == "" {
-//                    if item.hasImage {
-//                        deleteImageFromDirectory(named: item.imageName)
-//                    }
-//                    
-//                    do {
-//                        try self.realm.write {
-//                            self.realm.delete(item)
-//                        }
-//                    }catch{
-//                        print("Error deleting items with empty titlmes\(error)")
-//                }
-//                }
-//            }
-//        }
 
         
         navigationController?.navigationBar.titleTextAttributes = navigationBarAttributes2
@@ -352,7 +334,7 @@ class ItemTableViewController: UIViewController {
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
             
-            goToSettingsAllert(alertTitle: settingsAlertTitleCalendar, alertMessage: settingsAlertMessageCalendar)
+            goToSettingsAllert()
         }
     }
     
@@ -362,17 +344,17 @@ class ItemTableViewController: UIViewController {
             if granted {
                 self?.goToPopupAndSaveEvent()
             }else{
-                self?.goToSettingsAllert(alertTitle: self!.settingsAlertTitleCalendar, alertMessage: self!.settingsAlertMessageCalendar)
+                self?.goToSettingsAllert()
             }
         }
     }
     
     
-    func goToSettingsAllert (alertTitle: String, alertMessage: String) {
+    func goToSettingsAllert () {
         
-        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+        let alert = UIAlertController(title: SettingsAlert.title, message: SettingsAlert.message, preferredStyle: .alert)
         
-        let settingsAction = UIAlertAction(title: "Settings", style: .default) { (action) in
+        let settingsAction = UIAlertAction(title: SettingsAlert.settingActionTitle, style: .default) { (action) in
             guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
                 return
             }
@@ -384,7 +366,7 @@ class ItemTableViewController: UIViewController {
         }
         alert.addAction(settingsAction)
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: SettingsAlert.cancelActionTitle, style: .cancel, handler: nil)
         alert.addAction(cancelAction)
        
         DispatchQueue.main.sync { [weak self] in
@@ -402,14 +384,8 @@ class ItemTableViewController: UIViewController {
                 DispatchQueue.main.sync {
                 self!.goToPopupAndSetReminder()
                 }
-            case .denied:
-                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
-            case .notDetermined:
-                print("casenotDetermined is highly unlikely")
-                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
-            case .provisional:
-                print("caseProvisional is highly unlikely")
-                self!.goToSettingsAllert(alertTitle: self!.settingsAlertTitleNotification, alertMessage: self!.settingAlertMessageNotification)
+            case .denied, .provisional,.notDetermined:
+                self!.goToSettingsAllert()
             }
         }
     }
@@ -513,7 +489,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 tableView.reloadRows(at: [indexPath], with: .automatic)
             }
             strikeOut.image = strikeOutImage
-            strikeOut.backgroundColor = swipeCellBackgroundColorCustomPink
+            strikeOut.backgroundColor = Color.swipeCellBackgroundColorForDefault
             
              //REMINDER
             let setReminder = SwipeAction(style: .default, title: nil) {[weak self] (action, indexPath) in
@@ -522,7 +498,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 cell.hideSwipe(animated: true)
             }
             setReminder.image = reminderImage
-            setReminder.backgroundColor = swipeCellBackgroundColorCustomPink
+            setReminder.backgroundColor = Color.swipeCellBackgroundColorForDefault
             
              //CALENDAR
             let addEventToCalendar = SwipeAction(style: .default, title: nil) {[weak self] (action, indexPath) in
@@ -531,7 +507,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 cell.hideSwipe(animated: true)
             }
             addEventToCalendar.image = addEventToCalendarImage
-            addEventToCalendar.backgroundColor = swipeCellBackgroundColorCustomPink
+            addEventToCalendar.backgroundColor = Color.swipeCellBackgroundColorForDefault
             
             return[strikeOut, setReminder, addEventToCalendar]
             
@@ -541,18 +517,21 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 self?.deleteItem(at: indexPath)
             }
             deleteAction.image = deleteImage
-            deleteAction.backgroundColor = swipeCellBackgroundColorCustomRed
+            deleteAction.backgroundColor = Color.swipeCellBackGroundColorForDestructive
             
             //take photo
             let takePhotoAction = SwipeAction(style: .default, title: nil) {[weak self] (action, indexpath) in
-              
-                self!.selectedRowToAddTheImage = indexPath.row
-                self!.takePhotoAndSaveIt()
+                guard let `self` = self else {return}
+                
+                self.selectedRowToAddTheImage = indexPath.row
+                
+       
+                self.alertToChoseCameraOrPhotoLibrary()
                 
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            takePhotoAction.backgroundColor = swipeCellBackgroundColorCustomGray
+            takePhotoAction.backgroundColor = Color.swipeCellBackgroundColorForDefault
             takePhotoAction.image = takePhotoImage
             
             //edit title
@@ -561,7 +540,7 @@ extension ItemTableViewController: SwipeTableViewCellDelegate {
                 let cell: SwipeTableViewCell = tableView.cellForRow(at: indexPath) as! SwipeTableViewCell
                 cell.hideSwipe(animated: true)
             }
-            editTitleAction.backgroundColor = swipeCellBackgroundColorCustomGray
+            editTitleAction.backgroundColor = Color.swipeCellBackgroundColorForDefault
             editTitleAction.image = changeTitleImage
             
             return [deleteAction, takePhotoAction, editTitleAction]
@@ -663,72 +642,74 @@ extension ItemTableViewController {
 //MARK: - UIImagePicker extension
 extension ItemTableViewController: UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
-    func takePhotoAndSaveIt ()
-    {
-        alertToChoseCameraOrPhotoLibrary()
-    }
     
-    func alertToChoseCameraOrPhotoLibrary ()
-    {
-        let alert = UIAlertController(title: "Chose image", message: nil, preferredStyle: .actionSheet)
+    func alertToChoseCameraOrPhotoLibrary (){
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: { [weak self] (action) in
-            self!.checkForCameraAuthorizationStaturs()
+        alert.addAction(UIAlertAction(title: AlertCameraPhotoLibrary.cameraActionTitle, style: .default, handler: { [weak self] (action) in
+            self?.checkForCameraAuthorizationStaturs()
         }))
         
-        alert.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { [weak self] (action) in
-            self!.openGallery()
+        alert.addAction(UIAlertAction(title: AlertCameraPhotoLibrary.photoLibraryActionTitle, style: .default, handler: { [weak self] (action) in
+            //self?.openGallery()
         }))
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-
-            present(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: AlertCameraPhotoLibrary.cancelActionTitle, style: .cancel, handler: nil))
+        
+        DispatchQueue.main.async {[weak self] in
+            self?.present(alert, animated: true, completion: nil)
+        }
+        
 
         
     }
     
     func openCamera(){
-        
+
             if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerController.SourceType.camera)){
-                
+
                 imagePicker.sourceType = UIImagePickerController.SourceType.camera
                 imagePicker.allowsEditing = true
-                
+
+
                 present(imagePicker, animated: true, completion: nil)
-                
+
             }else{
-                let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                present(alert, animated: true, completion: nil)
+                let alert  = UIAlertController(title: NoCameraAlert.title, message: NoCameraAlert.message , preferredStyle: .alert)
+                
+                alert.addAction(UIAlertAction(title: NoCameraAlert.okActionTitle, style: .default, handler: nil))
+                
+                DispatchQueue.main.async {[weak self] in
+                    self?.present(alert, animated: true, completion: nil)
+                }
             }
-        
+
     }
     
-    func openGallery()
-    {
+    func openGallery(){
         imagePicker.sourceType = UIImagePickerController.SourceType.photoLibrary
         imagePicker.allowsEditing = true
         present(imagePicker, animated: true, completion: nil)
     }
     
-    func checkForCameraAuthorizationStaturs ()
-    {
+    func checkForCameraAuthorizationStaturs (){
+
         let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: .video)
-        
-        switch cameraAuthorizationStatus
-        {
+
+        switch cameraAuthorizationStatus{
         case .notDetermined: requestCameraPermission()
         case .authorized:
            DispatchQueue.main.async {[weak self] in
             self?.openCamera()
             }
-        case .restricted, .denied: goToSettingsAllert(alertTitle: settingAlertTitleCamera, alertMessage: settingAlertMessageCamera)
+        case .restricted, .denied: goToSettingsAllert()
         }
     }
 
     func requestCameraPermission() {
         AVCaptureDevice.requestAccess(for: .video, completionHandler: {[weak self] accessGranted in
             guard accessGranted == true else { return }
+            
             DispatchQueue.main.async {[weak self] in
                 self!.openCamera()
             }
@@ -737,26 +718,45 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
-        
+        print("image taken")
         guard let image = info[.editedImage] as? UIImage else {
             print("No image found")
             return
         }
-        let itemID = getItemID()
-        //chose random name for the image
-        
-        if let itemIDString = itemID {
+
+        savePhotoFromImagePicker(named: image)
+    }
+    
+    
+    
+    func savePhotoFromImagePicker (named image: UIImage) {
+        if let selectedRow = selectedRowToAddTheImage{
             
-            let nameForSavedImage = helperFileManager.saveImageToDocumentDirectory(named: image, for: itemIDString)
-            
-            if let selectedRow = selectedRowToAddTheImage
-            {
-                helperRealmManager.saveImageNameAsStringToRealm(named: nameForSavedImage, at: selectedRow)
+            if let items = helperRealmManager.items {
+                
+                if items[selectedRow].hasImage {
+                    print("--->item has image and it will change")
+                    helperFileManager.deleteImageFromDirectory(named: items[selectedRow].imageName)
+                    helperFileManager.saveImageToDocumentDirectory(named: image, for: items[selectedRow].imageName)
+                }else{
+                    print("--->item doesn't have image yet")
+                    let itemID = getItemID()
+                    //chose random name for the image
+                    if let itemIDString = itemID {
+                        let nameForImage = "\(itemIDString).png"
+                        helperFileManager.saveImageToDocumentDirectory(named: image, for: nameForImage)
+                        helperRealmManager.saveImageNameAsStringToRealm(named: nameForImage, at: selectedRow)
+                    }
+                }
+                tableView.reloadData()
             }
-            tableView.reloadData()
         }
     }
 }
+
+//
+
+
 
 //MARK: - Saving Photo functions realm
 
