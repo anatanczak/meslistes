@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app wants to use your photos to add them to items</string>
+	<string>we add photos to your items</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 	<key>CFBundleDevelopmentRegion</key>
@@ -29,7 +29,7 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>This app saves ivents in users calendar</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This app uses the camera to take photos and add them to items</string>
+	<string>we add photos to your items</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Fontfabric.otf</string>

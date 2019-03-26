@@ -30,6 +30,7 @@ class ListViewController: UIViewController {
     var isSwipeRightEnabled = true
   
     let eventStore = EKEventStore()
+   
     
     //MARK: - Life Cycle
     override func viewDidLoad() {
@@ -201,7 +202,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
     }
     
     func goToUserInputPopupAndChangeName (at indexPath: IndexPath) {
-        
+
         if let chosenListeToUpdate = helperRealmManager.lists?[indexPath.row] {
             
             let userTextInputVC = UserTextInputViewController()
@@ -367,7 +368,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alert.addAction(cancelAction)
         
-        DispatchQueue.main.sync { [weak self] in
+        DispatchQueue.main.async { [weak self] in
             self?.present(alert, animated: true, completion: nil)
         }
     }
@@ -381,7 +382,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             
             switch settings.authorizationStatus {
             case .authorized:
-                DispatchQueue.main.sync {
+                DispatchQueue.main.async {
                     // UI work here
                     self.goToPopupAndSetReminder()
                 }  
