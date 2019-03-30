@@ -23,6 +23,7 @@
 		4C250046212CA3ED004215D8 /* TextFieldPaddingEXT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C250045212CA3ED004215D8 /* TextFieldPaddingEXT.swift */; };
 		4C25004A2139C134004215D8 /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2500492139C134004215D8 /* UIView.swift */; };
 		4C25004C213C7D24004215D8 /* UIButton + Border.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C25004B213C7D24004215D8 /* UIButton + Border.swift */; };
+		4C4EEF6722469286007EE8D3 /* TestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C4EEF6622469286007EE8D3 /* TestViewController.swift */; };
 		4C907F2A2233F30A008C0BC2 /* HelperFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C907F292233F30A008C0BC2 /* HelperFileManager.swift */; };
 		4CA5BE312126E9EA00EB6457 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE302126E9EA00EB6457 /* Coordinator.swift */; };
 		4CA5BE342126FB1100EB6457 /* ListeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */; };
@@ -53,6 +54,7 @@
 		4C250045212CA3ED004215D8 /* TextFieldPaddingEXT.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldPaddingEXT.swift; sourceTree = "<group>"; };
 		4C2500492139C134004215D8 /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		4C25004B213C7D24004215D8 /* UIButton + Border.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton + Border.swift"; sourceTree = "<group>"; };
+		4C4EEF6622469286007EE8D3 /* TestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestViewController.swift; sourceTree = "<group>"; };
 		4C907F292233F30A008C0BC2 /* HelperFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperFileManager.swift; sourceTree = "<group>"; };
 		4CA5BE302126E9EA00EB6457 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		4CA5BE332126FB1100EB6457 /* ListeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListeTableViewCell.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 			children = (
 				4C239AA520D51B73004A0089 /* ListViewController.swift */,
 				4C1DFC0720DFEBB200F3D459 /* ItemTableViewController.swift */,
+				4C4EEF6622469286007EE8D3 /* TestViewController.swift */,
 				4CAE3A7821BFFC6600CFDE65 /* ImageVC.swift */,
 				4CA5BE3F212876E800EB6457 /* UserTextInputViewController.swift */,
 				4C1EB04820D7A0DC0056F1B5 /* DatePickerPopupViewController.swift */,
@@ -339,6 +342,7 @@
 			files = (
 				4C250046212CA3ED004215D8 /* TextFieldPaddingEXT.swift in Sources */,
 				4C25004C213C7D24004215D8 /* UIButton + Border.swift in Sources */,
+				4C4EEF6722469286007EE8D3 /* TestViewController.swift in Sources */,
 				4CA5BE40212876E800EB6457 /* UserTextInputViewController.swift in Sources */,
 				4C239A9220D51B36004A0089 /* AppDelegate.swift in Sources */,
 				4C1EB04920D7A0DC0056F1B5 /* DatePickerPopupViewController.swift in Sources */,
@@ -426,7 +430,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -480,7 +484,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
