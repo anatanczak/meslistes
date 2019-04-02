@@ -1,7 +1,4 @@
 PODS:
-  - Crashlytics (3.12.0):
-    - Fabric (~> 1.9.0)
-  - Fabric (1.9.0)
   - Realm (3.14.0):
     - Realm/Headers (= 3.14.0)
   - Realm/Headers (3.14.0)
@@ -10,18 +7,14 @@ PODS:
   - SwipeCellKit (2.5.4)
 
 DEPENDENCIES:
-  - Crashlytics
-  - Fabric
   - RealmSwift
   - SwipeCellKit
 
 SPEC CHECKSUMS:
-  Crashlytics: 07fb167b1694128c1c9a5a5cc319b0e9c3ca0933
-  Fabric: f988e33c97f08930a413e08123064d2e5f68d655
   Realm: 221b25919bb5a010a3c597d707f8df3492dcd93a
   RealmSwift: 28f22dfa6a27b9a778cfb09471558b6afcf1022c
   SwipeCellKit: 4eada3884ab1bbae5e8d2fb9030c242aa23d7f42
 
-PODFILE CHECKSUM: a83e2db7e4b979787dca1433b86df4a68009951f
+PODFILE CHECKSUM: dac5de2ebb1ed514e2587b7b12f78b9e8250d117
 
 COCOAPODS: 1.4.0

@@ -11,7 +11,6 @@ import UIKit
 import UserNotifications
 import EventKit
 import SwipeCellKit
-import SnapKit
 import StoreKit
 
 class ListViewController: UIViewController {
