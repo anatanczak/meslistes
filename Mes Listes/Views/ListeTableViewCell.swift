@@ -5,9 +5,10 @@
 //  Created by Anastasiia Tanczak on 17/08/2018.
 //  Copyright © 2018 Ana Viktoriv. All rights reserved.
 //
-
+// Just addibg some localization
 import UIKit
 import SwipeCellKit
+
 
 
 class ListeTableViewCell: SwipeTableViewCell {
@@ -23,6 +24,8 @@ class ListeTableViewCell: SwipeTableViewCell {
     var backgroundCellView = UIView()
     var iconView = UIImageView()
     var titleLabel = UILabel()
+    
+    
 
     //MARK: - Implementation
     
@@ -42,7 +45,9 @@ class ListeTableViewCell: SwipeTableViewCell {
         contentView.isOpaque = false
         contentView.backgroundColor = UIColor.clear
         
-        backgroundCellView.backgroundColor = .white
+//DAARRRKK
+        backgroundCellView.backgroundColor = UIColor(named: "listeBackgroundCellView")
+       
         contentView.addSubview(backgroundCellView)
         
         //titleLabel
@@ -50,7 +55,8 @@ class ListeTableViewCell: SwipeTableViewCell {
         titleLabel.textAlignment = .left
         titleLabel.font = UIFont.preferredFont(forTextStyle: .body)
         titleLabel.adjustsFontForContentSizeCategory = true
-        
+//   DARRRRKKK
+//        titleLabel.textColor = UIColor (named: "itemsVCcellTextColour")
         backgroundCellView.addSubview(titleLabel)
         
         //iconView
@@ -116,11 +122,21 @@ class ListeTableViewCell: SwipeTableViewCell {
             if liste.done == true {
                 let attributedString = NSMutableAttributedString.init(string: liste.name.uppercased())
                 attributedString.addAttribute(.strikethroughStyle, value: 2, range: NSRange.init(location: 0, length: liste.name.count))
-                attributedString.addAttribute(.foregroundColor, value: UIColor.lightGray , range: NSRange.init(location: 0, length: liste.name.count))
+                
+//DDDDAAAARRRKKKK buv .lightGray
+                if #available(iOS 13.0, *) {
+                    attributedString.addAttribute(.foregroundColor, value: UIColor.systemGray3, range: NSRange.init(location: 0, length: liste.name.count))
+                } else {
+                    // Fallback on earlier versions
+                }
                 titleLabel.attributedText = attributedString
             } else {
                 let attributedString = NSMutableAttributedString.init(string: liste.name.uppercased())
                 attributedString.addAttribute(.strikethroughStyle, value: 0, range: NSRange.init(location: 0, length: liste.name.count))
+                
+// DARRRRRKKKK
+                attributedString.addAttribute(.foregroundColor, value: UIColor(named: "itemsVCcellTextColour") as Any, range: NSRange.init(location: 0, length: liste.name.count))
+                
                 titleLabel.attributedText = attributedString
             }
             
@@ -143,3 +159,4 @@ class ListeTableViewCell: SwipeTableViewCell {
         iconView.image = nil
     }
 }
+

@@ -5,6 +5,7 @@
 //  Created by Anastasiia Tanczak on 17/08/2018.
 //  Copyright © 2018 Ana Viktoriv. All rights reserved.
 //
+// INTER 26.09.19
 
 import Foundation
 import UIKit
@@ -56,7 +57,7 @@ class Coordinator {
         let navController = UINavigationController(rootViewController: currentVC)
         window!.rootViewController = navController
         window!.makeKeyAndVisible()
-        window!.backgroundColor = UIColor.red
+        window!.backgroundColor = UIColor.clear
         
         //make navigationbar transparent
         navController.navigationBar.setBackgroundImage(UIImage(), for: .default)

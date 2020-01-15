@@ -1,0 +1,40 @@
+/* 
+  Localizable.strings
+  Mes Listes
+
+  Created by Ben on 9/26/19.
+  Copyright © 2019 Ana Viktoriv. All rights reserved.
+*/
+
+"We need your permission" = "Wir brauchen Ihre Erlaubniss";
+"Go to settings" = "Gehe zu Einstellungen";
+"Settings" = "Einstellungen";
+"Cancel" = "Schließen";
+
+"A little reminder:" = "Kurze Erinnerung:";
+
+"meslistes" = "Meslistes";
+
+"Shopping list" = "Einkaufsliste";
+"To do" = "To do Liste";
+"Travelpack" = "Reiseliste";
+
+"Type your item here..." = "Schreiben Sie Ihre Notiz hier...";
+
+"Take picture with Camera" = "Photo machen";
+"Choose from Photo Library" = "Photo wählen";
+
+"Warning" = "Achtung!";
+"You don't have camera" = "Keine Kamera vorhanden";
+"OK" = "OK";
+"You haven't created a list yet" = "Noch keine Liste erstellt";
+"You haven't created an item yet" = "Noch keine Position erstellt";
+
+"Add to reminder" = "Zu den Erinnerungen hinzufügen";
+"Add to calendar" = "Zum Kalender hinzufügen";
+"name your new list..." = "Benennen...";
+
+"Your event has been successfully added to calendar." = "Ihr Ereignis wurde erfolgreich zum Kalender hinzugefügt";
+"The reminder has been successfully created." = "TErinnerung ist erfolgreich abgespeichert.";
+"calendar" = "Erinnerung ist erfolgreich abgespeichert.";
+"reminder" = "Erinnerungen";

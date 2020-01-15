@@ -59,9 +59,11 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         
         contentView.isOpaque = false
         contentView.backgroundColor = UIColor.clear
-        
-        backgroundCellView.backgroundColor = .white
-        backgroundCellView.alpha = 0.7
+ 
+// DAAARRRRKKKK
+        backgroundCellView.backgroundColor = UIColor(named: "listeBackgroundCellView")
+//  DDDAAARRRKK better 1.0
+        backgroundCellView.alpha = 1
         addSubview(backgroundCellView)
         
         //iconview
@@ -72,10 +74,18 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
         //titlelabel
         titleTextView.text = ""
         titleTextView.textAlignment = .left
-        titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
+       titleTextView.font = UIFont.preferredFont(forTextStyle: .body)
+        
+// DAAARRRK
+//        titleTextView.textColor = UIColor (named: "itemsVCcellTextColour")
+        
         titleTextView.adjustsFontForContentSizeCategory = true
         titleTextView.isScrollEnabled = false
         titleTextView.returnKeyType = UIReturnKeyType.done
+//    DARK dodav
+      
+        
+        titleTextView.backgroundColor = .clear
       
         backgroundCellView.addSubview(titleTextView)
         
@@ -142,14 +152,25 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
             if item.done == true {
                 let attributedString = NSMutableAttributedString.init(string: item.title)
                 attributedString.addAttribute(.strikethroughStyle, value: 2, range: NSRange.init(location: 0, length: item.title.count))
-                attributedString.addAttribute(.foregroundColor, value: UIColor.lightGray , range: NSRange.init(location: 0, length: item.title.count))
+                
+// DDDAAAAARRRRKKK buv .lightGray
+                if #available(iOS 13.0, *) {
+                    attributedString.addAttribute(.foregroundColor, value: UIColor.systemGray3, range: NSRange.init(location: 0, length: item.title.count))
+                } else {
+                    // Fallback on earlier versions
+                }
                 titleTextView.attributedText = attributedString
+                
                 
                 iconView.image = #imageLiteral(resourceName: "gray-circle-icon")
                 
             }else{
                 let attributedString = NSMutableAttributedString.init(string: item.title)
                 attributedString.addAttribute(.strikethroughStyle, value: 0, range: NSRange.init(location: 0, length: item.title.count))
+  
+//                DAAAARRRRK
+                attributedString.addAttribute(.foregroundColor, value: UIColor (named: "itemsVCcellTextColour") as Any, range: NSRange.init(location: 0, length: item.title.count))
+                
                 titleTextView.attributedText = attributedString
                 
                 iconView.image = #imageLiteral(resourceName: "black-emty-circle-icon")
@@ -168,7 +189,7 @@ class ItemTableViewCell: SwipeTableViewCell, UITextViewDelegate {
                 photoButton.isHidden = true
             }
         }else{
-            titleTextView.text = "You haven't created an item yet"
+            titleTextView.text = NSLocalizedString("You haven't created an item yet", comment: "You haven't created an item yet")
         }
     }
     override func prepareForReuse() {

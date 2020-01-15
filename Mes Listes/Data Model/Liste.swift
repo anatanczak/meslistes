@@ -10,7 +10,7 @@ import Foundation
 import RealmSwift
 
 class Liste: Object {
-    @objc dynamic var name: String = ""
+    @objc dynamic var name: String = NSLocalizedString("", comment: "")
     @objc dynamic var done: Bool = false
     @objc dynamic var important : Bool = false
     @objc dynamic var iconName: String?

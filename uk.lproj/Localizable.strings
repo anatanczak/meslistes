@@ -1,0 +1,41 @@
+/* 
+  Localizable.strings
+  Mes Listes
+
+  Created by Ben on 9/26/19.
+  Copyright © 2019 Ana Viktoriv. All rights reserved.
+*/
+
+"We need your permission" = "Нам потрібен Ваш дозвіл";
+"Go to settings" = "Перевірте Параметри";
+"Settings" = "Параметри";
+"Cancel" = "Скасувати";
+
+"A little reminder:" = "Маленьке нагадування:";
+
+"meslistes" = "меслістес";
+
+"Shopping list" = "Закупи";
+"To do" = "Зробити";
+"Travelpack" = "Подорож";
+
+"Type your item here..." = "Надрукуйте Ваші нотатки тут...";
+
+"Take picture with Camera" = "Зняти фото";
+"Choose from Photo Library" = "Фототека";
+"Cancel" = "Скасувати";
+
+"Warning" = "Попередження";
+"You don't have camera" = "Камера відсутня";
+"OK" = "Гаразд";
+
+"You haven't created a list yet" = "Ви ще не створили список";
+"You haven't created an item yet" = "Ви ще не створили нотатку";
+"Add to reminder" = "Додати до Нагадувань";
+"Add to calendar" = "Додати до Календаря";
+"name your new list..." = "Створіть назву нотатки";
+
+"Your event has been successfully added to calendar." = "Подію успішно додано до календаря";
+"The reminder has been successfully created." = "Нагадування успішно створено";
+"calendar" = "Календар";
+"reminder" = "Нагадування";

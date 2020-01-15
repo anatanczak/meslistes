@@ -14,12 +14,13 @@ class UserTextInputViewController: UIViewController {
     
     
 
-    let alertViewGrayColor = UIColor(red: 224.0/255.0, green: 224.0/255.0, blue: 224.0/255.0, alpha: 1)
+    let alertViewGrayColor = UIColor(named: "userTextInputVCbuttonsBorder")
     
-    let textFieldPlaceHolderTextLitteral = "name your new list..."
+    let textFieldPlaceHolderTextLitteral = NSLocalizedString ("name your new list...", comment: "name your new list")
     let textFieldPlaceholderTextColor = UIColor.init(red: 140/255, green: 140/255, blue: 140/255, alpha: 1)
     let textFieldLeftPadding: CGFloat = 10
     let textFieldBorderWidth: CGFloat = 0.5
+//DARK
     let textFieldBorderColor = UIColor.init(red: 200/255, green: 199/255, blue: 204/255, alpha: 1)
     let textFieldFontSize: CGFloat = 18
     
@@ -40,10 +41,11 @@ class UserTextInputViewController: UIViewController {
     
     let backgroundColorView: UIView = UIView()
     
-    let mainView: UIView = {
+   let mainView: UIView = {
         let view = UIView()
-        view.backgroundColor = UIColor.white
+    view.backgroundColor = UIColor (named: "userTextInputVCbackgroundMainView")
         view.layer.cornerRadius = 10
+
         return view
     }()
     
@@ -65,7 +67,7 @@ class UserTextInputViewController: UIViewController {
         layout.minimumInteritemSpacing = 1
         
         let collectionView = UICollectionView(frame: CGRect.zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = UIColor.white
+        collectionView.backgroundColor = UIColor(named: "")
         
         return collectionView
     }()
@@ -113,7 +115,10 @@ class UserTextInputViewController: UIViewController {
     
     private func setupViews () {
    
-        backgroundColorView.backgroundColor = UIColor.black.withAlphaComponent(0.34)
+        backgroundColorView.backgroundColor =
+//  DDAAARRRKK
+//           UIColor(named:"popUpListeScreen1")!.withAlphaComponent(0.34)
+            UIColor.black.withAlphaComponent(0.5)
         backgroundColorView.isOpaque = false
         backgroundColorView.alpha = 0.0
         view.addSubview(backgroundColorView)
@@ -146,15 +151,15 @@ class UserTextInputViewController: UIViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
         
         //save button
-        okButton.setTitle("OK", for: .normal)
+        okButton.setTitle(NSLocalizedString("OK", comment: "OK"), for: .normal)
         okButton.backgroundColor = UIColor.clear
-        okButton.setTitleColor(UIColor.black, for: .normal)
+        okButton.setTitleColor(UIColor (named: "popUpButtonFont"), for: .normal)
         okButton.addTarget(self, action: #selector(oKButtonAction), for: .touchUpInside)
 
 
         //cancel button
-        cancelButton.setTitle("Cancel", for: .normal)
-        cancelButton.setTitleColor(UIColor.black, for: .normal)
+        cancelButton.setTitle(NSLocalizedString("Cancel", comment: "Cancel"), for: .normal)
+       cancelButton.setTitleColor(UIColor (named: "popUpButtonFont"), for: .normal)
         cancelButton.backgroundColor = UIColor.clear
         cancelButton.addTarget(self, action: #selector(cancelButtonAction), for: .touchUpInside)
 
@@ -212,14 +217,23 @@ class UserTextInputViewController: UIViewController {
         
     }
 
+
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        cancelButton.addBorder(side: .Top, color: alertViewGrayColor, width: 1)
-        cancelButton.addBorder(side: .Right, color: alertViewGrayColor, width: 0.5)
-        okButton.addBorder(side: .Top, color: alertViewGrayColor, width: 1)
-        okButton.addBorder(side: .Left, color: alertViewGrayColor, width: 0.5)
+        cancelButton.addBorder(side: .Top, color: alertViewGrayColor!, width: 1)
+        cancelButton.addBorder(side: .Right, color: alertViewGrayColor!, width: 0.5)
+        okButton.addBorder(side: .Top, color: alertViewGrayColor!, width: 1)
+        okButton.addBorder(side: .Left, color: alertViewGrayColor!, width: 0.5)
+//   Border main View
+//        mainView.addBorderMainView(side: .Top, color: alertViewGrayColor!, width: 1)
+//        mainView.addBorderMainView(side: .Bottom, color: alertViewGrayColor!, width: 1)
+//        mainView.addBorderMainView(side: .Left, color: alertViewGrayColor!, width: 1)
+//        mainView.addBorderMainView(side: .Right, color: alertViewGrayColor!, width: 1)
+
     }
+    
+
 
     //MARK: - Button Actions
     @objc func oKButtonAction () {

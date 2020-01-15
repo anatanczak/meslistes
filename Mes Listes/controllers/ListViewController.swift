@@ -45,7 +45,8 @@ class ListViewController: UIViewController {
     private func setupNavigationBar () {
         
         self.title = NavigationBar.title
-        navigationController?.navigationBar.titleTextAttributes = NavigationBar.titleAttributes
+//        navigationController?.navigationBar.titleTextAttributes = NavigationBar.titleAttributes
+        navigationController?.navigationBar.titleTextAttributes = NavigationBar.titleAttributes as [NSAttributedString.Key : Any]
         NavigationBar.rightButtonImage = NavigationBar.rightButtonImage?.withRenderingMode(.alwaysOriginal)
         let rightNavigationButton = UIBarButtonItem(image: NavigationBar.rightButtonImage, style: .plain, target: self, action: #selector (rightBarButtonAction))
         self.navigationItem.setRightBarButton(rightNavigationButton, animated: false)
@@ -63,8 +64,18 @@ class ListViewController: UIViewController {
     
     //MARK: - Layout
     private func setupView () {
-        self.view.layer.contents = ImageInListController.background.cgImage
 
+        
+        //        self.view.layer.contents = ImageInListController.background.cgImage
+        
+        
+        // backgroundImageView
+        backgroundImageView.image = ImageInListController.background
+        backgroundImageView.contentMode = .scaleAspectFill
+
+        view.addSubview(backgroundImageView)
+        
+        
         //tableView
         tableView.delegate = self
         tableView.dataSource = self
@@ -79,6 +90,16 @@ class ListViewController: UIViewController {
     
     private func setupLayout() {
         
+        backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+        backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
+        backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        
+         ])
+//         backgroundImageView.anchor(top: view.topAnchor, leading: view.leadingAnchor, bottom: view.bottomAnchor, trailing: view.trailingAnchor)
+//
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -331,6 +352,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
             goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
+        @unknown default:
+            print("unknown case of authorisationStatus")
         }
     }
     
@@ -387,6 +410,8 @@ extension ListViewController: SwipeTableViewCellDelegate {
                 }  
             case .denied, .notDetermined, .provisional:
                 self.goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
+            @unknown default:
+                print("unknown case of authorisationStatus")
             }
         }
     }
