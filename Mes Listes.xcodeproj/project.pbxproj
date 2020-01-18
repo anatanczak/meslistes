@@ -133,9 +133,9 @@
 		4C239AAA20D51B9A004A0089 /* controllers */ = {
 			isa = PBXGroup;
 			children = (
+				4C907F2B2233FC57008C0BC2 /* helpers */,
 				4C239AA520D51B73004A0089 /* ListViewController.swift */,
 				4C1DFC0720DFEBB200F3D459 /* ItemTableViewController.swift */,
-				4C907F2B2233FC57008C0BC2 /* helpers */,
 				4C4EEF6622469286007EE8D3 /* TestViewController.swift */,
 				4CAE3A7821BFFC6600CFDE65 /* ImageVC.swift */,
 				4CA5BE3F212876E800EB6457 /* UserTextInputViewController.swift */,
@@ -506,6 +506,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 5L8ZCK6563;
 				INFOPLIST_FILE = "Mes Listes/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -513,6 +514,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anavidev.meslistes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -528,6 +530,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 5L8ZCK6563;
 				INFOPLIST_FILE = "Mes Listes/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -535,6 +538,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anavidev.meslistes;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

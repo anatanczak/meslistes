@@ -6,7 +6,11 @@
   Copyright © 2019 Ana Viktoriv. All rights reserved.
 */
 
-"We need your permission" = "Wir brauchen Ihre Erlaubniss";
+
+"We need your permission to access your calendar" = "Wir brauchen Ihre Erlaubnis für den Zugang zum Kalender";
+"We need your permission to send you notifications" = "Wir brauchen Ihre Erlaubnis um Ihnen Mitteilungen schicken zu können";
+"We need your permission to access your camera" = "Wir brauchen Ihre Erlaubnis für den Zugang zur Kamera";
+"We need your permission to access your photo library"  = "Wir brauchen Ihre Erlaubnis für den Zugang zur Fotogalerie";
 "Go to settings" = "Gehe zu Einstellungen";
 "Settings" = "Einstellungen";
 "Cancel" = "Schließen";

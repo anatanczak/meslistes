@@ -6,7 +6,10 @@
   Copyright © 2019 Ana Viktoriv. All rights reserved.
 */
 
-"We need your permission" = "Нам потрібен Ваш дозвіл";
+"We need your permission to access your calendar" = "Нам потрібен доступ до вашого календаря";
+"We need your permission to send you notifications" = "Нам потрібен Ваш дозвіл щоб надсилати вам нагадування";
+"We need your permission to access your camera" = "Нам потрібен доступ до вашої камери";
+"We need your permission to access your photo library"  = "Нам потрібен доступ до ваших світлин";
 "Go to settings" = "Перевірте Параметри";
 "Settings" = "Параметри";
 "Cancel" = "Скасувати";

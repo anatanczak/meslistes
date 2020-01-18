@@ -6,7 +6,10 @@
   Copyright © 2019 Ana Viktoriv. All rights reserved.
 */
 
-"We need your permission" = "We need your permission";
+"We need your permission to access your calendar" = "We need your permission to access your calendar";
+"We need your permission to send you notifications" = "We need your permission to send you notifications";
+"We need your permission to access your camera" = "We need your permission to access your camera";
+"We need your permission to access your photo library" = "We need your permission to access your photo library";
 "Go to settings" = "Go to settings";
 "Settings" = "Settings";
 "Cancel" = "Cancel";
@@ -30,7 +33,7 @@
 
 "You haven't created a list yet" = "You haven't created a list yet";
 "You haven't created an item yet" = "You haven't created an item yet";
-"Add to reminder" = "Zu den Erinnerungen hinzufügen";
+"Add to reminder" = "Add to reminder";
 "Add to calendar" = "Add to calendar";
 "name your new list" = "name your new list";
 

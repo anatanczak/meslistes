@@ -320,8 +320,10 @@ extension ListViewController: SwipeTableViewCellDelegate {
         dpVC.modalPresentationStyle = .overCurrentContext
         dpVC.dateForCalendar = true
         dpVC.saveEventToCalendar = saveEventToCalendar
-        self.present(dpVC, animated: true, completion: nil)
         
+         DispatchQueue.main.async { [weak self] in
+        self?.present(dpVC, animated: true, completion: nil)
+        }
         
     }
     func saveEventToCalendar(_ date: Date) ->(){
@@ -351,7 +353,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
             goToPopupAndSaveEvent()
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
-            goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
+            self.goToSettingsAllert(alertTitle: SettingsAlertCalendar.title, alertMessage: SettingsAlertCalendar.message, alertActionTitle: SettingsAlertCalendar.settingActionTitle, alertCancelActionTitle: SettingsAlertCalendar.cancelActionTitle)
         @unknown default:
             print("unknown case of authorisationStatus")
         }
@@ -365,17 +367,17 @@ extension ListViewController: SwipeTableViewCellDelegate {
             if granted {
                 self.goToPopupAndSaveEvent()
             }else{
-                self.goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
+                self.goToSettingsAllert(alertTitle: SettingsAlertCalendar.title, alertMessage: SettingsAlertCalendar.message, alertActionTitle: SettingsAlertCalendar.settingActionTitle, alertCancelActionTitle: SettingsAlertCalendar.cancelActionTitle)
             }
         }
     }
     
     
-    func goToSettingsAllert (alertTitle: String, alertMessage: String) {
+    func goToSettingsAllert (alertTitle: String, alertMessage: String, alertActionTitle: String, alertCancelActionTitle: String) {
         
         let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         
-        let settingsAction = UIAlertAction(title: "Settings", style: .default) {(action) in
+        let settingsAction = UIAlertAction(title: alertActionTitle, style: .default) {(action) in
             guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
                 return
             }
@@ -387,7 +389,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
         }
         alert.addAction(settingsAction)
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: alertCancelActionTitle, style: .cancel, handler: nil)
         alert.addAction(cancelAction)
         
         DispatchQueue.main.async { [weak self] in
@@ -409,7 +411,7 @@ extension ListViewController: SwipeTableViewCellDelegate {
                     self.goToPopupAndSetReminder()
                 }  
             case .denied, .notDetermined, .provisional:
-                self.goToSettingsAllert(alertTitle: SettingsAlert.title, alertMessage: SettingsAlert.message)
+                self.goToSettingsAllert(alertTitle: SettingsAlertNotifications.title, alertMessage: SettingsAlertNotifications.message, alertActionTitle: SettingsAlertNotifications.settingActionTitle, alertCancelActionTitle: SettingsAlertNotifications.cancelActionTitle)
             @unknown default:
                 print("unknown case of authorisationStatus")
             }

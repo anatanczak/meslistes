@@ -6,7 +6,11 @@
   Copyright © 2019 Ana Viktoriv. All rights reserved.
 */
 
-"We need your permission" = "Meslistes a besoin de votre autorisation";
+
+"We need your permission to access your calendar" = "Meslistes a besoin d'accéder à votre agenda";
+"We need your permission to send you notifications" = "Meslistes a besoin de l'autorisation pour vous envoyer les notifications";
+"We need your permission to access your camera" = "Meslistes a besoin d'accéder à l'appareil photo de votre téléphone";
+"We need your permission to access your photo library"  = "Meslistes a besoin d'accéder à vos photo";
 "Go to settings" = "acceder aux réglages";
 "Settings" = "Réglages";
 "Cancel" = "Annuler";

@@ -20,8 +20,29 @@ enum TimeIntervals {
  static let timeIntervalForEndDate: Double = 3600
 }
 
-enum SettingsAlert {
-    static let title = NSLocalizedString("We need your permission", comment: "We need your permission")
+enum SettingsAlertCalendar {
+    static let title = NSLocalizedString("We need your permission to access your calendar", comment: "We need your permission to access your calendar")
+    static let message = NSLocalizedString("Go to settings", comment: "Go to settings")
+    static let settingActionTitle = NSLocalizedString("Settings", comment: "Settings")
+    static let cancelActionTitle = NSLocalizedString("Cancel", comment: "Cancel")
+}
+
+enum SettingsAlertNotifications {
+    static let title = NSLocalizedString("We need your permission to send you notifications", comment: "We need your permission to send you notifications")
+    static let message = NSLocalizedString("Go to settings", comment: "Go to settings")
+    static let settingActionTitle = NSLocalizedString("Settings", comment: "Settings")
+    static let cancelActionTitle = NSLocalizedString("Cancel", comment: "Cancel")
+}
+
+enum SettingsAlertCamera {
+    static let title = NSLocalizedString("We need your permission to access your camera", comment: "We need your permission to access your camera")
+    static let message = NSLocalizedString("Go to settings", comment: "Go to settings")
+    static let settingActionTitle = NSLocalizedString("Settings", comment: "Settings")
+    static let cancelActionTitle = NSLocalizedString("Cancel", comment: "Cancel")
+}
+
+enum SettingsAlertPhotoLibrary {
+    static let title = NSLocalizedString("We need your permission to access your photo library", comment: "We need your permission to access your photo library")
     static let message = NSLocalizedString("Go to settings", comment: "Go to settings")
     static let settingActionTitle = NSLocalizedString("Settings", comment: "Settings")
     static let cancelActionTitle = NSLocalizedString("Cancel", comment: "Cancel")

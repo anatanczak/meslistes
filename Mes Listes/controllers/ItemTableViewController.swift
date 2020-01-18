@@ -319,7 +319,9 @@ class ItemTableViewController: UIViewController {
         dpVC.dateForCalendar = true
         dpVC.saveEventToCalendar = saveEventToCalendar
         
-        self.present(dpVC, animated: true, completion: nil)
+        DispatchQueue.main.async { [weak self] in
+        self?.present(dpVC, animated: true, completion: nil)
+        }
     }
     func saveEventToCalendar(_ date: Date) ->(){
         
@@ -351,7 +353,7 @@ class ItemTableViewController: UIViewController {
         case EKAuthorizationStatus.restricted, EKAuthorizationStatus.denied:
             // We need to help them give us permission
             
-            goToSettingsAllert()
+            self.goToSettingsAllert(alertTitle: SettingsAlertCalendar.title, alertMessage: SettingsAlertCalendar.message, alertActionTitle: SettingsAlertCalendar.settingActionTitle, alertCancelActionTitle: SettingsAlertCalendar.cancelActionTitle)
         @unknown default:
             print("unknown case of authorisationStatus")
         }
@@ -360,20 +362,22 @@ class ItemTableViewController: UIViewController {
     func firstTimeAccessToCalendar () {
         
         eventStore.requestAccess(to: .event) {[weak self] (granted, error) in
+            guard let `self` = self else {return}
+            
             if granted {
-                self?.goToPopupAndSaveEvent()
+                self.goToPopupAndSaveEvent()
             }else{
-                self?.goToSettingsAllert()
+                self.goToSettingsAllert(alertTitle: SettingsAlertCalendar.title, alertMessage: SettingsAlertCalendar.message, alertActionTitle: SettingsAlertCalendar.settingActionTitle, alertCancelActionTitle: SettingsAlertCalendar.cancelActionTitle)
             }
         }
     }
     
     
-    func goToSettingsAllert () {
+    func goToSettingsAllert (alertTitle: String, alertMessage: String, alertActionTitle: String, alertCancelActionTitle: String) {
         
-        let alert = UIAlertController(title: SettingsAlert.title, message: SettingsAlert.message, preferredStyle: .alert)
+        let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         
-        let settingsAction = UIAlertAction(title: SettingsAlert.settingActionTitle, style: .default) { (action) in
+        let settingsAction = UIAlertAction(title: alertActionTitle, style: .default) { (action) in
             guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else {
                 return
             }
@@ -385,7 +389,7 @@ class ItemTableViewController: UIViewController {
         }
         alert.addAction(settingsAction)
         
-        let cancelAction = UIAlertAction(title: SettingsAlert.cancelActionTitle, style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: alertCancelActionTitle, style: .cancel, handler: nil)
         alert.addAction(cancelAction)
         
         DispatchQueue.main.async { [weak self] in
@@ -397,14 +401,15 @@ class ItemTableViewController: UIViewController {
     func getNotificationSettingStatus () {
         
         UNUserNotificationCenter.current().getNotificationSettings {[weak self] (settings) in
+            guard let `self` = self else {return}
             
             switch settings.authorizationStatus {
             case .authorized:
                 DispatchQueue.main.async {
-                    self!.goToPopupAndSetReminder()
+                    self.goToPopupAndSetReminder()
                 }
             case .denied, .provisional,.notDetermined:
-                self!.goToSettingsAllert()
+                self.goToSettingsAllert(alertTitle: SettingsAlertNotifications.title, alertMessage: SettingsAlertNotifications.message, alertActionTitle: SettingsAlertNotifications.settingActionTitle, alertCancelActionTitle: SettingsAlertNotifications.cancelActionTitle)
             @unknown default:
                 print("unknown case of authorisationStatus")
             }
@@ -726,7 +731,7 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
             DispatchQueue.main.async {[weak self] in
                 self?.openCamera()
             }
-        case .restricted, .denied: goToSettingsAllert()
+        case .restricted, .denied: goToSettingsAllert(alertTitle: SettingsAlertCamera.title, alertMessage: SettingsAlertCamera.message, alertActionTitle: SettingsAlertCamera.settingActionTitle, alertCancelActionTitle: SettingsAlertCamera.cancelActionTitle)
         @unknown default:
             print("unknown case of authorisationStatus")
         }
@@ -785,7 +790,7 @@ extension ItemTableViewController: UINavigationControllerDelegate, UIImagePicker
         switch status {
         case .notDetermined: requestPhotoLibraryPermission()
         case .authorized: DispatchQueue.main.async {[weak self] in self?.openPhotoLibrary() }
-        case .restricted, .denied: goToSettingsAllert()
+        case .restricted, .denied: goToSettingsAllert(alertTitle: SettingsAlertPhotoLibrary.title, alertMessage: SettingsAlertPhotoLibrary.message, alertActionTitle: SettingsAlertPhotoLibrary.settingActionTitle, alertCancelActionTitle: SettingsAlertPhotoLibrary.cancelActionTitle)
         @unknown default:
             print("unknown case of authorisationStatus")
         }
