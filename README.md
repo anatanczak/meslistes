@@ -13,4 +13,4 @@ Il n’est pas nécessaire d'être un pro du smartphone pour utiliser cette appl
 ***Dark Mode***
 ![dark mode](dark_mode.jpg)
 ***Light Mode***
-![light mode](light_mode.gif)
+![light mode](light_mode_1.gif)
