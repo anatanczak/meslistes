@@ -6,11 +6,11 @@ ne pas oublier quand on part en voyage.
 On peut également prendre des photos d’objets et les ajouter à sa liste. 
 Il n’est pas nécessaire d'être un pro du smartphone pour utiliser cette application, elle très intuitive et facile à utiliser.
 
-**Lien :**
+**Lien :**  
 [Télécharger l'application sur l'App Store](https://apps.apple.com/us/app/meslistes-a-checklist-app/id1458475140?ign-mpt=uo%3D2)
 
-**Aperçu :**
-***Dark Mode***
+**Aperçu :**  
+***Dark Mode***  
 ![dark mode](dark_mode.jpg)
-***Light Mode***
+***Light Mode***  
 ![light mode](light_mode_1.gif)
