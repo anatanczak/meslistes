@@ -10,4 +10,7 @@ Il n’est pas nécessaire d'être un pro du smartphone pour utiliser cette appl
 [Télécharger l'application sur l'App Store](https://apps.apple.com/us/app/meslistes-a-checklist-app/id1458475140?ign-mpt=uo%3D2)
 
 **Aperçu :**
+***Dark Mode***
 ![dark mode](dark_mode.jpg)
+***Light Mode***
+![light mode](light_mode.gif)
