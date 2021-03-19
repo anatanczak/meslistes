@@ -4,7 +4,7 @@ MESLISTES est plus qu'une simple to-do list, c’est une application indispensab
 On peut y créer plusieurs listes : les courses, les choses à faire, les films à regarder, les lieux à visiter ou encore les choses à 
 ne pas oublier quand on part en voyage. 
 On peut également prendre des photos d’objets et les ajouter à sa liste. 
-Il n’est pas nécessaire d'être un pro du smartphone pour utiliser cette application, elle esr très intuitive et facile à utiliser.
+Il n’est pas nécessaire d'être un pro du smartphone pour utiliser cette application, elle est très intuitive et facile à utiliser.
 
 **Lien :**  
 [Télécharger l'application sur l'App Store](https://apps.apple.com/us/app/meslistes-a-checklist-app/id1458475140?ign-mpt=uo%3D2)
